@@ -23,6 +23,7 @@
         <itemPath>../../imageproc-lib/pid_hw.h</itemPath>
         <itemPath>../../imageproc-lib/stopwatch.h</itemPath>
         <itemPath>../../imageproc-lib/pid.h</itemPath>
+        <itemPath>../../imageproc-lib/tih.h</itemPath>
       </logicalFolder>
       <logicalFolder name="lib" displayName="lib" projectFiles="true">
         <itemPath>../lib/adc_pid.h</itemPath>
@@ -74,6 +75,7 @@
         <itemPath>../../imageproc-lib/pid_hw.c</itemPath>
         <itemPath>../../imageproc-lib/pid.c</itemPath>
         <itemPath>../../imageproc-lib/version.c</itemPath>
+        <itemPath>../../imageproc-lib/tih.c</itemPath>
       </logicalFolder>
       <logicalFolder name="lib" displayName="lib" projectFiles="true">
         <itemPath>../../imageproc-lib/delay.s</itemPath>
