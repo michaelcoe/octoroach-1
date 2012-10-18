@@ -28,60 +28,62 @@ void adcSetup(void){
 	initDma0(); //DMA is needed to read multiple values from the ADC core
 }
 
-static void adcSetupPeripheral(void){
-	unsigned int AD1CON1value, AD1CON2value, AD1CON3value, AD1CON4value, 
-				AD1PCFGHvalue, AD1PCFGLvalue, AD1CSSHvalue, AD1CSSLvalue, 
-				AD1CHS0value, AD1CHS123value;
+static void adcSetupPeripheral(void) {
+    unsigned int AD1CON1value, AD1CON2value, AD1CON3value, AD1CON4value,
+            AD1PCFGHvalue, AD1PCFGLvalue, AD1CSSHvalue, AD1CSSLvalue,
+            AD1CHS0value, AD1CHS123value;
 
-	//Setup:
-	//ADC1 : Ch0 - AN11 then AN1
-	//		 Ch1 - AN0 then AN3
-	//ADC2 : Left unconfigured for user applications
+    AD1CON1value = ADC_MODULE_ON & //ADC module is enabled
+            ADC_IDLE_CONTINUE & // ADC will continue in idle mode
+            ADC_AD12B_10BIT & // ADC in 10 bit mode
+            ADC_FORMAT_INTG & // ADC in integer format (CLARIFY)
+            ADC_CLK_MPWM & // MCPWM interval ends sampling and starts conversion
+            ADC_MULTIPLE & //Sequential sampling
+            ADC_ADDMABM_ORDER & //DMA buffers are written in the order of conversion
+            ADC_AUTO_SAMPLING_ON & //ADC does not need to be triggered manually
+            ADC_SAMP_ON; //sample / hold amplifiers are sampling  (maybe incorrect)
+    AD1CON2value = ADC_VREF_AVDD_AVSS & //Vref+ = AVdd , Vref- = AVss
+            ADC_SCAN_ON & //Scan through ADC channels
+            ADC_SELECT_CHAN_0 & //Only CH0, will scan through all 5 pins
+            ADC_ALT_BUF_OFF & //Use one 16 word buffer
+            ADC_ALT_INPUT_OFF & // Alternate between MUXA and MUXB
+            ADC_DMA_ADD_INC_1; //Increment DMA address after each sample
+    AD1CON3value = ADC_CONV_CLK_SYSTEM & //Use System clock, not internal RC osc
+            ADC_CONV_CLK_3Tcy & //Tad = 3 * Tcy TODO: Check this
+            ADC_SAMPLE_TIME_1; //Sample Time = 1*Tad
+    AD1CON4value = ADC_DMA_BUF_LOC_1; //This may be wrong (TODO)
 
-	AD1CON1value = ADC_MODULE_ON & 			//ADC module is enabled
-				   ADC_IDLE_CONTINUE & 		// ADC will continue in idle mode 
-                   ADC_AD12B_10BIT & 		// ADC in 10 bit mode
-				   ADC_FORMAT_INTG & 		// ADC in integer format (CLARIFY)
-				   ADC_CLK_MPWM & 			// MCPWM interval ends sampling and starts conversion
-                   ADC_SIMULTANEOUS & 		//Simultaneously sample CH0 and CH1
-				   ADC_ADDMABM_ORDER &		//DMA buffers are written in the order of conversion
-				   ADC_AUTO_SAMPLING_ON & 	//ADC does not need to be triggered manually
-				   ADC_SAMP_ON;				//sample / hold amplifiers are sampling  (maybe incorrect)
-    AD1CON2value = ADC_VREF_AVDD_AVSS & 	//Vref+ = AVdd , Vref- = AVss
-				   ADC_SCAN_OFF & 			//Do not scan through ADC channels
-				   ADC_SELECT_CHAN_01 & 	//Sample & convert 
-				   ADC_ALT_BUF_OFF &		//Use one 16 word buffer
-				   ADC_ALT_INPUT_ON & 		// Alternate between MUXA and MUXB
-				   ADC_DMA_ADD_INC_2;		//Increment DMA address after 2 samples, to account for alt. sampling
-    AD1CON3value = ADC_CONV_CLK_SYSTEM & 	//Use System clock, not internal RC osc
-				   ADC_CONV_CLK_3Tcy & 		//Tad = 3 * Tcy
-				   ADC_SAMPLE_TIME_1; 		//Sample Time = 1*Tad
-	AD1CON4value = ADC_DMA_BUF_LOC_4; 		//This may be wrong (TODO)
-	
-    
-	AD1CHS123value = ADC_CH123_NEG_SAMPLEA_VREFN & 	// Sample A, Vref- = AVss
-					 ADC_CH123_POS_SAMPLEA_0_1_2 & 	// Sample A, CH1=AN0, CH2=AN1, CH3=AN2
-					 ADC_CH123_NEG_SAMPLEB_VREFN & 	// Sample B, Vref- = AVss
-					 ADC_CH123_POS_SAMPLEB_3_4_5;  	// Sample B, CH1=AN3, CH2=AN4, CH3=AN5
 
- 	AD1CHS0value = ADC_CH0_NEG_SAMPLEA_VREFN & 		// Sample A, Vref- = AVss
-				   ADC_CH0_POS_SAMPLEA_AN11 & 		// Sample A, CH0 = AN11
-				   ADC_CH0_NEG_SAMPLEB_VREFN & 		// Sample B, Vref- = AVss
-				   ADC_CH0_POS_SAMPLEB_AN1; 		// Sample A, CH0 = AN1
-					 
+    AD1CHS123value = 0; //Dummy value, CH 1,2,3 unused
 
-    AD1CSSHvalue = SCAN_NONE_16_31; 				//Skip AN16-AN131 for Input Scan
-	AD1CSSLvalue = SCAN_NONE_0_15; 					//Skip AN0-AN15 for Input Scan
+    AD1CHS0value = ADC_CH0_NEG_SAMPLEA_VREFN & // Sample A, Vref- = AVss = ground
+            ADC_CH0_POS_SAMPLEA_AN0 & // Battery
+            ADC_CH0_POS_SAMPLEA_AN8 & // Motor A
+            ADC_CH0_POS_SAMPLEA_AN9 & // Motor B
+            ADC_CH0_POS_SAMPLEA_AN10& // Motor C
+            ADC_CH0_POS_SAMPLEA_AN11; // Motor D
 
-	//Set pins to analog inputs; also check init_default.c
-	AD1PCFGHvalue = ENABLE_ALL_DIG_16_31; //Shouldn't matter, only AN0-15 on 706A
-    AD1PCFGLvalue = ENABLE_AN0_ANA & ENABLE_AN1_ANA & ENABLE_AN3_ANA & ENABLE_AN11_ANA;
-	 
+
+    AD1CSSHvalue = SCAN_NONE_16_31; //Skip AN16-AN131 for Input Scan, not avail on dsPic33
+    //Scan: AN0, AN8, AN9, AN10, AN11
+    AD1CSSLvalue = SCAN_ALL_0_15 & SKIP_SCAN_AN1 & SKIP_SCAN_AN2 &
+            SKIP_SCAN_AN3 & SKIP_SCAN_AN4 & SKIP_SCAN_AN5 &
+            SKIP_SCAN_AN6 & SKIP_SCAN_AN7 & SKIP_SCAN_AN12 &
+            SKIP_SCAN_AN13 & SKIP_SCAN_AN14 & SKIP_SCAN_AN15; //Leaving: AN0, AN8, AN9, AN10, AN11
+
+    //Set pins to analog inputs; also check init_default.c
+    AD1PCFGHvalue = ENABLE_ALL_DIG_16_31; //Shouldn't matter, only AN0-15 on 706A
+    AD1PCFGLvalue = ENABLE_AN0_ANA & //Battery
+            ENABLE_AN8_ANA & //Motor A
+            ENABLE_AN9_ANA & //Motor B
+            ENABLE_AN10_ANA & //Motor C
+            ENABLE_AN11_ANA; //Motor D
+
     SetChanADC1(AD1CHS123value, AD1CHS0value);
     OpenADC1(AD1CON1value, AD1CON2value, AD1CON3value, AD1CON4value, AD1PCFGLvalue, AD1PCFGHvalue, AD1CSSHvalue, AD1CSSLvalue);
-	
-	IFS0bits.AD1IF = 0; // Clear the A/D interrupt flag bit
-	IEC0bits.AD1IE = 0; //Disable A/D interrupt
+
+    IFS0bits.AD1IF = 0; // Clear the A/D interrupt flag bit
+    IEC0bits.AD1IE = 0; //Disable A/D interrupt
 }
 
 
