@@ -29,6 +29,7 @@
 #include "tail_ctrl.h"
 #include "ams-enc.h"
 #include "imu.h"
+#include "tih.h"
 
 #include <stdlib.h>
 
@@ -57,17 +58,43 @@ int main(void) {
     int old_ipl;
     mSET_AND_SAVE_CPU_IP(old_ipl, 1)
 
-    swatchSetup();
+    swatchSetup(); //Stopwatch
+
+    //Radio
     radioInit(src_addr_init, src_pan_id_init, RADIO_RXPQ_MAX_SIZE, RADIO_TXPQ_MAX_SIZE);
     radioSetChannel(RADIO_CHANNEL); //Set to my channel
     macSetDestAddr(dst_addr_init);
 
+    tiHSetup();
+
     dfmemSetup();
-    //xlSetup();
-    gyroSetup();
-    mcSetup();
+    //xlSetup();  //Not present on IP 2.5
+    //gyroSetup();  //Now MPU on IP2.5
+    //mcSetup();
     cmdSetup();
     adcSetup();
+
+    ///// ADC TEST
+    /*
+    int i = 0; int j =0;
+    unsigned int data[21][8];
+    float throts[21] = {-100., -90., -80., -70., -60., -50., -40., -30., -20., -10., 0.,
+10., 20., 30., 40., 50., 60., 70., 80., 90., 100.};
+    
+    for (i = 0; i < 21; i++) {
+        tiHSetFloat(4, throts[i]);
+        delay_ms(100);
+        for (j = 0; j < 8; j++) {
+            delay_ms(100);
+            data[i][j] = adcGetAN11();
+        }
+    }
+*/
+    Nop();
+    Nop();
+    
+    ////////////
+
     telemSetup(); //Timer 5
     encSetup();
     imuSetup();

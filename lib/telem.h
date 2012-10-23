@@ -18,15 +18,12 @@ typedef struct {
     int accelX;
     int accelY;
     int accelZ;
-    int bemfL;
-    int bemfR;
-    float tailTorque;
+    int bemfA, bemfB, bemfC, bemfD;
     int Vbatt;
     int steerAngle;
     float tailAngle;
-    float bodyPosition;
-    unsigned long motor_count[2];
-    int sOut;
+    float imuYaw;
+    unsigned long hall_count[2];
 } telemStruct_t;
 
 //TODO: A union is not neccesary here. Remove for clarity, and chage related

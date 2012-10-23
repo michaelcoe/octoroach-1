@@ -6,7 +6,7 @@
 //#define MAXTHROT 3976
 #define SATTHROT (int)((3976.0/4000.0)*(float)FULLTHROT)
 
-#define NUM_MOTOR_PIDS 2
+#define NUM_MOTOR_PIDS 4
 
 // These defines will make a correspondance for other modules calling the
 // functions below that take in a "num" for a given motor.

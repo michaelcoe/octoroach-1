@@ -58,10 +58,10 @@ def main():
     #Verify all robots have steering gains set
     verifyAllSteeringGainsSet()  #exits on failure
     
-    tailGains = [0, 0, 0, 0, 0]
-    R1.setTailGains(tailGains)
+    #tailGains = [0, 0, 0, 0, 0]
+    #R1.setTailGains(tailGains)
     #Verify all robots have tail gains set
-    verifyAllTailGainsSet()  #exits on failure
+    #verifyAllTailGainsSet()  #exits on failure
     
     # Steering controller setpoint
     #R1.setSteeringRate(0 , retries = 8)
@@ -95,11 +95,10 @@ def main():
     #         135, 135, 10000,   MOVE_SEG_CONSTANT, 0, 0, 0]
              
     #Ramp example
-    numMoves = 2
+    numMoves = 1
     moveq1 = [numMoves, \
-        150, 150, 5000,   MOVE_SEG_CONSTANT, 0,  0,  0, STEER_MODE_YAW_SPLIT, int(round(shared.deg2count*0.0)),
-        150, 150, 6000,   MOVE_SEG_CONSTANT, 0,  0,  0, STEER_MODE_YAW_SPLIT, int(round(shared.deg2count*-90.0))]
-
+        150, 150, 2000,   MOVE_SEG_CONSTANT, 0,  0,  0, STEER_MODE_OFF, int(round(shared.deg2count*0.0))
+        ]
         
     #Timing settings
     R1.leadinTime = 500;

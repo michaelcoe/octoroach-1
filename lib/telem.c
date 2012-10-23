@@ -22,7 +22,7 @@
 
 #define TIMER_FREQUENCY     300                 // 400 Hz
 #define TIMER_PERIOD        1/TIMER_FREQUENCY
-#define DEFAULT_SKIP_NUM    2 //Default to 150 Hz save rate
+#define DEFAULT_SKIP_NUM    1 //Default to 150 Hz save rate
 //#define LSB2DEG    0.0695652174 //DEFINED IN TWO PLACES!
 
 #if defined(__RADIO_HIGH_DATA_RATE)
@@ -34,7 +34,7 @@
 
 //TODO: Remove externs by adding getters to other modules
 extern pidObj motor_pidObjs[NUM_MOTOR_PIDS];
-extern int bemf[NUM_MOTOR_PIDS];
+//extern int bemf[NUM_MOTOR_PIDS];
 extern pidObj steeringPID;
 extern pidObj tailPID;
 
@@ -190,14 +190,12 @@ static void telemISRHandler() {
     if (skipcounter == 0) {
         if (samplesToSave > 0) {
             /////// Get XL data
-            
+
             data.telemStruct.sampleIndex = sampIdx;
             //Stopwatch was already started in the cmdSpecialTelemetry function
             data.telemStruct.timeStamp = (long) swatchTic();
             data.telemStruct.inputL = motor_pidObjs[0].input;
             data.telemStruct.inputR = motor_pidObjs[1].input;
-            //data.telemStruct.dcL = PDC3;
-            //data.telemStruct.dcR = PDC4;
             data.telemStruct.dcL = PDC1;
             data.telemStruct.dcR = PDC2;
             data.telemStruct.gyroX = imuGetGyroXValue();
@@ -213,17 +211,16 @@ static void telemISRHandler() {
             data.telemStruct.accelY = 0;
             data.telemStruct.accelZ = 0;
 
-
-            data.telemStruct.bemfL = bemf[0];
-            data.telemStruct.bemfR = bemf[1];
-            data.telemStruct.tailTorque = tailTorque;
-            data.telemStruct.Vbatt = adcGetVBatt();
+            data.telemStruct.bemfA = adcGetMotorA();
+            data.telemStruct.bemfB = adcGetMotorB();
+            data.telemStruct.bemfC = adcGetMotorC();
+            data.telemStruct.bemfD = adcGetMotorD();
+            data.telemStruct.Vbatt = adcGetVbatt();
             data.telemStruct.steerAngle = tailPID.input;
             data.telemStruct.tailAngle = lastTailPos;
-            data.telemStruct.bodyPosition = imuGetBodyZPositionDeg();
-            data.telemStruct.motor_count[0] = motor_count[0];
-            data.telemStruct.motor_count[1] = motor_count[1];
-            data.telemStruct.sOut = steeringPID.output;
+            data.telemStruct.imuYaw = imuGetBodyZPositionDeg();
+            data.telemStruct.hall_count[0] = motor_count[0];
+            data.telemStruct.hall_count[0] = motor_count[1];
             telemSaveData(&data);
             sampIdx++;
         }
@@ -240,12 +237,10 @@ static void telemISRHandler() {
     if (telemStreamingFlag == TELEM_STREAM_ON) {
         if (streamSkipCounter == 0) {
             if (samplesToStream > 0) {
-
                 /////// Get XL data
-                //xlGetXYZ((unsigned char*) xldata);
 
-                //Stopwatch was already started in the cmdSpecialTelemetry function
                 data.telemStruct.sampleIndex = sampIdx;
+                //Stopwatch was already started in the cmdSpecialTelemetry function
                 data.telemStruct.timeStamp = (long) swatchTic();
                 data.telemStruct.inputL = motor_pidObjs[0].input;
                 data.telemStruct.inputR = motor_pidObjs[1].input;
@@ -255,14 +250,25 @@ static void telemISRHandler() {
                 data.telemStruct.gyroY = imuGetGyroYValue();
                 data.telemStruct.gyroZ = imuGetGyroZValue();
                 data.telemStruct.gyroAvg = imuGetGyroZValueAvgDeg();
-                data.telemStruct.accelX = 0; //xldata[0];
-                data.telemStruct.accelY = 0; //xldata[1];
-                data.telemStruct.accelZ = 0; //xldata[2];
-                data.telemStruct.bemfL = bemf[0];
-                data.telemStruct.bemfR = bemf[1];
-                data.telemStruct.sOut = steeringPID.output;
-                data.telemStruct.Vbatt = adcGetVBatt();
-                data.telemStruct.steerAngle = steeringPID.input;
+
+                /*data.telemStruct.accelX = xldata[0];
+                data.telemStruct.accelY = xldata[1];
+                data.telemStruct.accelZ = xldata[2]; */
+
+                data.telemStruct.accelX = 0;
+                data.telemStruct.accelY = 0;
+                data.telemStruct.accelZ = 0;
+
+                data.telemStruct.bemfA = adcGetMotorA();
+                data.telemStruct.bemfB = adcGetMotorB();
+                data.telemStruct.bemfC = adcGetMotorC();
+                data.telemStruct.bemfD = adcGetMotorD();
+                data.telemStruct.Vbatt = adcGetVbatt();
+                data.telemStruct.steerAngle = tailPID.input;
+                data.telemStruct.tailAngle = lastTailPos;
+                data.telemStruct.imuYaw = imuGetBodyZPositionDeg();
+                data.telemStruct.hall_count[0] = motor_count[0];
+                data.telemStruct.hall_count[0] = motor_count[1];
                 sampIdx++;
                 //Send back data:
                 Payload pld;

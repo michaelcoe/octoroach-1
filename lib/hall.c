@@ -465,8 +465,8 @@ static void hallUpdateBEMF() {
     //Back EMF measurements are made automatically by coordination of the ADC, PWM, and DMA.
     //Copy to local variables. Not strictly neccesary, just for clarity.
     //This **REQUIRES** that the divider on the battery & BEMF circuits have the same ratio.
-    hallbemf[0] = adcGetVBatt() - adcGetBEMFL();
-    hallbemf[1] = adcGetVBatt() - adcGetBEMFR();
+    hallbemf[0] = adcGetVbatt() - adcGetMotorA();
+    hallbemf[1] = adcGetVbatt() - adcGetMotorB();
     //NOTE: at this point, we should have a proper correspondance between
     //   the order of all the structured variable; bemf[i] associated with
     //   pidObjs[i], bemfLast[i], etc.
