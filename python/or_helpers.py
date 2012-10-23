@@ -281,7 +281,7 @@ class Robot:
         self.findFileName()
         self.writeFileHeader()
         fileout = open(self.dataFileName, 'a')
-        np.savetxt(fileout , np.array(self.imudata), '%d,'*14+'%f,%d,%d,%f,%f,%d,%d,%d', delimiter = ',')
+        np.savetxt(fileout , np.array(self.imudata), '%d,'*18+'%f,%f,%d,%d', delimiter = ',')
         fileout.close()
         self.clAnnounce()
         print "Telemtry data saved to", self.dataFileName

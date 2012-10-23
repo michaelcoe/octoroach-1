@@ -117,14 +117,11 @@ void legCtrlSetup() {
 
     //Set which PWM output each PID Object will correspond to
     legCtrlOutputChannels[0] = MC_CHANNEL_PWM1;
-    //legCtrlOutputChannels[1] = MC_CHANNEL_PWM4;
     legCtrlOutputChannels[1] = MC_CHANNEL_PWM2;
 
     SetupTimer1(); // Timer 1 @ 1 Khz
     int retval;
     retval = sysServiceInstallT1(legCtrlServiceRoutine);
-    //ADC_OffsetL = 1; //prevent divide by zero errors
-    //ADC_OffsetR = 1;
 
     //Move Queue setup and initialization
     moveq = mqInit(32);
@@ -180,7 +177,7 @@ void serviceMotionPID() {
         //We are now measuring battery voltage directly via AN0,
         // so the input offset to each PID loop can actually be tracked, and needs
         // to be updated. This should compensate for battery voltage drooping over time.
-        motor_pidObjs[j].inputOffset = adcGetVBatt();
+        motor_pidObjs[j].inputOffset = adcGetVbatt();
 
         //pidobjs[0] : Left side
         //pidobjs[0] : Right side
@@ -222,8 +219,10 @@ void updateBEMF() {
     //Back EMF measurements are made automatically by coordination of the ADC, PWM, and DMA.
     //Copy to local variables. Not strictly neccesary, just for clarity.
     //This **REQUIRES** that the divider on the battery & BEMF circuits have the same ratio.
-    bemf[0] = adcGetVBatt() - adcGetBEMFL();
-    bemf[1] = adcGetVBatt() - adcGetBEMFR();
+    //bemf[0] = adcGetVBatt() - adcGetBEMFL();
+    //bemf[1] = adcGetVBatt() - adcGetBEMFR();
+    bemf[0] = adcGetVbatt() - adcGetMotorA();
+    bemf[1] = adcGetVbatt() - adcGetMotorD();
     //NOTE: at this point, we should have a proper correspondance between
     //   the order of all the structured variable; bemf[i] associated with
     //   pidObjs[i], bemfLast[i], etc.
