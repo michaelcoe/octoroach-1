@@ -81,14 +81,16 @@ static void adcSetupPeripheral(void) {
             AD1PCFGLvalue, AD1PCFGHvalue, AD1CSSHvalue, AD1CSSLvalue);
 
     //The following is a "patch" to the above settings
+    AD1CON1bits.AD12B = 0; //10bit mode
     AD1CON2bits.SMPI = 5-1;  //every 5th sample
     AD1CON2bits.CHPS = 0;
     AD1CON1bits.SIMSAM = 0; //overridden
     AD1CON1bits.ADDMABM = 0;
     AD1CON4bits.DMABL = 0; //1 word buffer each
     AD1CON2bits.ALTS = 0;
-    AD1CHS0bits.CH0NA = 0;
-    AD1CHS0bits.CH0SA = 0; //overridden
+    //AD1CHS0bits.CH0NA = 0;
+    //AD1CHS0bits.CH0SA = 0; //overridden
+    AD1CON2bits.VCFG = 000; //Avdd and Avss
     AD1CON2bits.CSCNA = 1;
     AD1CSSL = 0; //clear it first
     AD1CSSLbits.CSS0 = 1;
