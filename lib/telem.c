@@ -8,41 +8,47 @@
 #include "led.h"
 #include "gyro.h"
 #include "xl.h"
-#include "stopwatch.h"
+#include "sclock.h"
 #include "pid.h"
 #include "orient.h"
 #include "dfilter_avg.h"
 #include "adc_pid.h"
 #include "leg_ctrl.h"
 #include "sys_service.h"
+#include "ams-enc.h"
+#include "imu.h"
+#include "cmd.h" //for CMD codes
 #include <string.h> //for memcpy
-#include "cmd.h"
 
 #define TIMER_FREQUENCY     300                 // 400 Hz
 #define TIMER_PERIOD        1/TIMER_FREQUENCY
 #define DEFAULT_SKIP_NUM    2 //Default to 150 Hz save rate
+//#define LSB2DEG    0.0695652174 //DEFINED IN TWO PLACES!
 
 #if defined(__RADIO_HIGH_DATA_RATE)
 #define READBACK_DELAY_TIME_MS 3
 #else
-#define READBACK_DELAY_TIME_MS 10
+#define READBACK_DELAY_TIME_MS 8
 #endif
 
 
-//TODO: Remove externs by adding getters to other modules
+// TODO (apullin) : Remove externs by adding getters to other modules
 extern pidObj motor_pidObjs[NUM_MOTOR_PIDS];
 extern int bemf[NUM_MOTOR_PIDS];
 extern pidObj steeringPID;
-
-extern pidObj phase_pidObj;
-extern unsigned long phaseDiff;
+extern pidObj tailPID;
 
 //global flag from radio module to know if last packet was ACK'd
-//TODO: fix this, add a getter for the flag to radio code
+// TODO (apullin) : fix this, add a getter for the flag to radio code
 extern volatile char g_last_ackd;
 
-//Filter stuctures for gyro variables
-extern filterAvgInt_t gyroZavg;
+
+extern float lastTailPos;
+extern float tailTorque;
+
+extern long motor_count[2];
+
+float telemGyroValue = 0.0;
 
 ////////   Private variables   ////////////////
 static unsigned long samplesToSave = 0;
@@ -55,6 +61,9 @@ static unsigned long samplesToStream = 0;
 static char telemStreamingFlag = TELEM_STREAM_OFF;
 static unsigned int streamSkipCounter = 0;
 static unsigned int streamSkipNum = 15;
+
+//Offset for time value when recording samples
+static unsigned long telemStartTime = 0;
 
 //Function to be installed into T5, and setup function
 static void SetupTimer5(); // Might collide with setup in steering module!
@@ -91,9 +100,6 @@ static void SetupTimer5() {
     //ConfigIntTimer5(T5_INT_PRIOR_5 & T5_INT_ON);
 }
 
-////   Public functions
-////////////////////////
-
 void telemSetup() {
     int retval;
     retval = sysServiceInstallT5(telemServiceRoutine);
@@ -102,6 +108,7 @@ void telemSetup() {
 
 void telemSetSamplesToSave(unsigned long n) {
     samplesToSave = n;
+    sampIdx = 0;
 }
 
 void telemReadbackSamples(unsigned long numSamples) {
@@ -129,7 +136,8 @@ void telemReadbackSamples(unsigned long numSamples) {
         do {
             telemSendDataDelay(PACKETSIZE, (unsigned char*) (&sampleData), delaytime_ms);
             //trx_status = phyReadBit(SR_TRAC_STATUS);
-            delaytime_ms += 2;
+            //Linear backoff
+            delaytime_ms += 1;
         } while (g_last_ackd == 0);
         delaytime_ms = READBACK_DELAY_TIME_MS;
     }
@@ -180,49 +188,47 @@ void telemErase(unsigned long numSamples) {
 
 static void telemISRHandler() {
     telemU data;
-    int gyroAvg[3];
-    int gyroData[3];
-    int gyroOffsets[3];
-    int xldata[3];
-
-    //float orZ[3];
-    //orientGetOrZ(orZ);
 
     //skipcounter decrements to 0, triggering a telemetry save, and resets
     // value of skicounter
     if (skipcounter == 0) {
         if (samplesToSave > 0) {
-
-            /////// Get Gyro data and calc average via filter
-            gyroGetXYZ((unsigned char*) gyroData);
-            gyroGetOffsets(gyroOffsets);
-            //filterAvgUpdate(&gyroZavg,gyroData[2] - gyroOffsets[2]);
-            //Only average for Z
-            gyroAvg[2] = filterAvgCalc(&gyroZavg);
-
             /////// Get XL data
-            xlGetXYZ((unsigned char*) xldata);
 
-            //Stopwatch was already started in the cmdSpecialTelemetry function
             data.telemStruct.sampleIndex = sampIdx;
-            data.telemStruct.timeStamp = (long) swatchTic();
+            data.telemStruct.timeStamp = sclockGetTime() - telemStartTime;
             data.telemStruct.inputL = motor_pidObjs[0].input;
             data.telemStruct.inputR = motor_pidObjs[1].input;
+            //data.telemStruct.dcL = PDC3; //For IP2.4 modified to use Hbridge
+            //data.telemStruct.dcR = PDC4; //For IP2.4 modified to use Hbridge
             data.telemStruct.dcL = PDC1;
             data.telemStruct.dcR = PDC2;
-            data.telemStruct.gyroX = gyroData[0] - gyroOffsets[0];
-            data.telemStruct.gyroY = gyroData[1] - gyroOffsets[1];
-            data.telemStruct.gyroZ = gyroData[2] - gyroOffsets[2];
-            data.telemStruct.gyroAvg = gyroAvg[2];
-            data.telemStruct.accelX = xldata[0];
+            data.telemStruct.gyroX = imuGetGyroXValue();
+            data.telemStruct.gyroY = imuGetGyroYValue();
+            data.telemStruct.gyroZ = imuGetGyroZValue();
+            data.telemStruct.gyroAvg = imuGetGyroZValueAvgDeg();
+
+            //XL temprorarily disabled to prevent collision with AM encoder
+            // TODO (apullin, fgb, nkohut) : bring XL access into imu module
+            /*data.telemStruct.accelX = xldata[0];
             data.telemStruct.accelY = xldata[1];
-            data.telemStruct.accelZ = xldata[2];
+            data.telemStruct.accelZ = xldata[2]; */
+
+            data.telemStruct.accelX = 0;
+            data.telemStruct.accelY = 0;
+            data.telemStruct.accelZ = 0;
+
+
             data.telemStruct.bemfL = bemf[0];
             data.telemStruct.bemfR = bemf[1];
-            data.telemStruct.sOut = steeringPID.output;
+            data.telemStruct.tailTorque = tailTorque;
             data.telemStruct.Vbatt = adcGetVBatt();
-            data.telemStruct.steerAngle = steeringPID.input;
-            data.telemStruct.phaseDiff = phaseDiff;
+            data.telemStruct.steerAngle = tailPID.input;
+            data.telemStruct.tailAngle = lastTailPos;
+            data.telemStruct.bodyPosition = imuGetBodyZPositionDeg();
+            data.telemStruct.motor_count[0] = motor_count[0];
+            data.telemStruct.motor_count[1] = motor_count[1];
+            data.telemStruct.sOut = steeringPID.output;
             telemSaveData(&data);
             sampIdx++;
         }
@@ -239,36 +245,30 @@ static void telemISRHandler() {
     if (telemStreamingFlag == TELEM_STREAM_ON) {
         if (streamSkipCounter == 0) {
             if (samplesToStream > 0) {
-                /////// Get Gyro data and calc average via filter
-                gyroGetXYZ((unsigned char*) gyroData);
-                gyroGetOffsets(gyroOffsets);
-                //filterAvgUpdate(&gyroZavg,gyroData[2] - gyroOffsets[2]);
-                //Only average for Z
-                gyroAvg[2] = filterAvgCalc(&gyroZavg);
 
                 /////// Get XL data
-                xlGetXYZ((unsigned char*) xldata);
+                //xlGetXYZ((unsigned char*) xldata);
 
-                //Stopwatch was already started in the cmdSpecialTelemetry function
                 data.telemStruct.sampleIndex = sampIdx;
-                data.telemStruct.timeStamp = (long) swatchTic();
+                data.telemStruct.timeStamp = sclockGetTime() - telemStartTime;
                 data.telemStruct.inputL = motor_pidObjs[0].input;
                 data.telemStruct.inputR = motor_pidObjs[1].input;
                 data.telemStruct.dcL = PDC1;
                 data.telemStruct.dcR = PDC2;
-                data.telemStruct.gyroX = gyroData[0] - gyroOffsets[0];
-                data.telemStruct.gyroY = gyroData[1] - gyroOffsets[1];
-                data.telemStruct.gyroZ = gyroData[2] - gyroOffsets[2];
-                data.telemStruct.gyroAvg = gyroAvg[2];
-                data.telemStruct.accelX = xldata[0];
-                data.telemStruct.accelY = xldata[1];
-                data.telemStruct.accelZ = xldata[2];
+                data.telemStruct.gyroX = imuGetGyroXValue();
+                data.telemStruct.gyroY = imuGetGyroYValue();
+                data.telemStruct.gyroZ = imuGetGyroZValue();
+                data.telemStruct.gyroAvg = imuGetGyroZValueAvgDeg();
+                //XL temprorarily disabled to prevent collision with AM encoder
+                // TODO (apullin, fgb, nkohut) : bring XL access into imu module
+                data.telemStruct.accelX = 0; //xldata[0];
+                data.telemStruct.accelY = 0; //xldata[1];
+                data.telemStruct.accelZ = 0; //xldata[2];
                 data.telemStruct.bemfL = bemf[0];
                 data.telemStruct.bemfR = bemf[1];
                 data.telemStruct.sOut = steeringPID.output;
                 data.telemStruct.Vbatt = adcGetVBatt();
                 data.telemStruct.steerAngle = steeringPID.input;
-                data.telemStruct.phaseDiff = phaseDiff;
                 sampIdx++;
                 //Send back data:
                 Payload pld;
@@ -294,7 +294,11 @@ void telemSetSkip(unsigned int skipnum) {
     telemSkipNum = skipnum;
 }
 
-void telemStartStreaming(unsigned long num) {
-    telemStreamingFlag = TELEM_STREAM_ON;
-    samplesToStream = num;
+//This function is a setter for the telemStartTime variable,
+//which is used to offset the recorded times for telemetry, such that
+//they start at approx. 0, instead of reflecting the total number of
+//sclock ticks.
+
+void telemSetStartTime(void) {
+    telemStartTime = sclockGetTime();
 }
