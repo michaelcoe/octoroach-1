@@ -24,6 +24,7 @@
         <itemPath>../../imageproc-lib/stopwatch.h</itemPath>
         <itemPath>../../imageproc-lib/pid.h</itemPath>
         <itemPath>../../imageproc-lib/tih.h</itemPath>
+        <itemPath>../../imageproc-lib/adc_pid.h</itemPath>
       </logicalFolder>
       <logicalFolder name="lib" displayName="lib" projectFiles="true">
         <itemPath>../lib/motor_ctrl.h</itemPath>
@@ -42,7 +43,6 @@
         <itemPath>../lib/sys_service.h</itemPath>
         <itemPath>../lib/hall.h</itemPath>
         <itemPath>../lib/ams-enc.h</itemPath>
-        <itemPath>../lib/adc_pid.h</itemPath>
         <itemPath>../lib/imu.h</itemPath>
       </logicalFolder>
       <itemPath>source/cmd.h</itemPath>
@@ -77,6 +77,7 @@
         <itemPath>../../imageproc-lib/pid.c</itemPath>
         <itemPath>../../imageproc-lib/version.c</itemPath>
         <itemPath>../../imageproc-lib/tih.c</itemPath>
+        <itemPath>../../imageproc-lib/adc_pid.c</itemPath>
       </logicalFolder>
       <logicalFolder name="lib" displayName="lib" projectFiles="true">
         <itemPath>../../imageproc-lib/delay.s</itemPath>
@@ -93,7 +94,6 @@
         <itemPath>../lib/sys_service.c</itemPath>
         <itemPath>../lib/hall.c</itemPath>
         <itemPath>../lib/ams-enc.c</itemPath>
-        <itemPath>../lib/adc_pid.c</itemPath>
         <itemPath>../lib/imu.c</itemPath>
       </logicalFolder>
       <itemPath>source/cmd.c</itemPath>
@@ -118,7 +118,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.10</languageToolchainVersion>
+        <languageToolchainVersion>1.11</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
