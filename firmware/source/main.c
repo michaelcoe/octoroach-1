@@ -1,184 +1,103 @@
-/******************************************************************************
- * Name: main.c
- * Desc:
- * Date: 2010-07-08
- * Author: stanbaek
- *******************************************************************************/
-
-#include "settings.h"
-#include "Generic.h"
+/*********************************************************************************************************
+* Name: main.c
+* Desc: A test suite for the ImageProc 2.2 system. These tests should not be
+* considered rigorous, exhaustive tests of the hardware, but rather
+* "smoke tests" - ie. turn on the functionality and make sure the 
+* hardware/software doesn't start "smoking."
+*
+* The architecture is based on a function pointer queue scheduling model. The
+* meat of the testing logic resides in test.c. If the radio has received a 
+* command packet during the previous timer interval for Timer2, the appropriate
+* function pointer is added to a queue in the interrupt service routine for 
+* Timer2 (interrupts.c). The main loop simply pops the function pointer off
+* the top of the queue and executes it. 
+*
+* Date: 2011-04-13
+* Author: AMH, Ryan Julian
+*********************************************************************************************************/
 #include "p33Fxxxx.h"
+#include "init.h"
 #include "init_default.h"
-#include "ports.h"
-#include "battery.h"
-#include "cmd.h"
-#include "radio.h"
-#include "xl.h"
-#include "gyro.h"
+#include "timer.h"
 #include "utils.h"
-#include "stopwatch.h"
-#include "motor_ctrl.h"
-#include "led.h"
+#include "queue.h"
+#include "radio.h"
+#include "MyConsts/radio_settings.h"
+#include "tests.h" 
 #include "dfmem.h"
-#include "leg_ctrl.h"
-#include "pid.h"
-#include "adc_pid.h"
-#include "steering.h"
-#include "telem.h"
-#include "hall.h"
-#include "tail_ctrl.h"
+#include "interrupts.h"
+#include "sclock.h"
 #include "ams-enc.h"
-#include "imu.h"
 #include "tih.h"
-
+#include "blink.h"
 #include <stdlib.h>
+#include "cmd.h"
+#include "pid-ip2.5.h"
+#include "steering.h"
+#include "consts.h"
+#include "adc_pid.h"
 
-extern unsigned char id[4];
+Payload rx_payload;
+MacPacket rx_packet;
+Test* test;
+unsigned int error_code;
 
-volatile unsigned long wakeTime;
-extern volatile char g_radio_duty_cycle;
-extern volatile char inMotion;
+int main() {
+    fun_queue = queueInit(FUN_Q_LEN);
+    test_function tf;
+    error_code = ERR_NONE;
 
-int dcCounter;
-
-int main(void) {
-
-    wakeTime = 0;
-    dcCounter = 0;
-
-    WordVal src_addr_init = {RADIO_SRC_ADDR};
-    WordVal src_pan_id_init = {RADIO_SRC_PAN_ID};
-    WordVal dst_addr_init = {RADIO_DST_ADDR};
-
+    /* Initialization */
     SetupClock();
     SwitchClocks();
     SetupPorts();
-    //batSetup();
 
-    int old_ipl;
-    mSET_AND_SAVE_CPU_IP(old_ipl, 1)
+    SetupInterrupts();
+ //   SetupADC(); old A/D
+    adcSetup();   // DMA A/D
+//    SetupTimer1(); setup in pidSetup
+    SetupTimer2();
+    sclockSetup();
+    mpuSetup();
+    amsHallSetup();
+    dfmemSetup(); 
+    tiHSetup();   // set up H bridge drivers
+	cmdSetup();  // setup command table
+	pidSetup();  // setup PID control
 
-    swatchSetup(); //Stopwatch
+    // Radio setup
+    radioInit(RADIO_RXPQ_MAX_SIZE, RADIO_TXPQ_MAX_SIZE);
+    radioSetChannel(RADIO_MY_CHAN);
+    radioSetSrcAddr(RADIO_SRC_ADDR);
+    radioSetSrcPanID(RADIO_PAN_ID);
+    setupTimer6(RADIO_FCY); // Radio and buffer loop timer
+/**** set up steering last - so dfmem can finish ****/
+	steeringSetup(); // steering and Timer5 Int 
+	blink_leds(4,500); // blink LEDs 4 times at half sec
+    char j;
+    for(j=0; j<3; j++){
+        LED_2 = ON;
+        delay_ms(250);
+        LED_2 = OFF;
+        delay_ms(250);
+    }
 
-    //Radio
-    radioInit(src_addr_init, src_pan_id_init, RADIO_RXPQ_MAX_SIZE, RADIO_TXPQ_MAX_SIZE);
-    radioSetChannel(RADIO_CHANNEL); //Set to my channel
-    macSetDestAddr(dst_addr_init);
+    LED_2 = ON;
 
-    tiHSetup();
-
-    dfmemSetup();
-    //xlSetup();  //Not present on IP 2.5
-    //gyroSetup();  //Now MPU on IP2.5
-    //mcSetup();
-    cmdSetup();
-    adcSetup();
-
-    ///// ADC TEST
-    /*
-    int i = 0; int j =0;
-    unsigned int data[21][8];
-    float throts[21] = {-100., -90., -80., -70., -60., -50., -40., -30., -20., -10., 0.,
-10., 20., 30., 40., 50., 60., 70., 80., 90., 100.};
-    
-    for (i = 0; i < 21; i++) {
-        tiHSetFloat(4, throts[i]);
-        delay_ms(100);
-        for (j = 0; j < 8; j++) {
-            delay_ms(100);
-            data[i][j] = adcGetAN11();
+    EnableIntT2;
+    while(1){
+        while(!queueIsEmpty(fun_queue))
+        {
+            test = queuePop(fun_queue);
+            rx_payload = macGetPayload(test->packet);
+            tf = test->tf;
+            (*tf)(payGetType(rx_payload),   // old commands don't use packet type
+                    payGetStatus(rx_payload), 
+			  payGetDataLength(rx_payload), 
+                    payGetData(rx_payload));
+            radioReturnPacket(test->packet);
+            free(test);
         }
     }
-*/
-    Nop();
-    Nop();
-    
-    ////////////
-
-    telemSetup(); //Timer 5
-    encSetup();
-    imuSetup();
-
-// #ifdef  NK 8/14/12
-    //hallSetup();    // Timer 1, Timer 2
-    //hallSteeringSetup(); //doesn't exist yet
-//#else //No hall sensors, standard BEMF control
-    legCtrlSetup(); // Timer 1
-    steeringSetup();  //Timer 5
-//#endif
-
-   //tailCtrlSetup(); //////////////////////
-
-    //ovcamSetup();
-
-    //radioReadTrxId(id);
-
-    LED_RED = 1; //Red is use an "alive" indicator
-    LED_GREEN = 0;
-    LED_YELLOW = 0;
-
-    //Radio startup verification
-    if(phyGetState() == 0x16)  { LED_GREEN = 1; }
-
-    //Sleeping and low power options
-    //_VREGS = 1;
-    //gyroSleep();
-
-    while (1) {
-        cmdHandleRadioRxBuffer();
-
-#ifndef __DEBUG //Idle will not work with debug
-        //Simple idle:
-        if (radioIsRxQueueEmpty()) {
-            Idle();
-            //_T1IE = 0;
-        }
-#endif
-
-        //delay_ms(1000);
-        //cmdEcho(0, 1 , (unsigned char*)(&i) );
-        //i++;
-        //if(radioIsRxQueueEmpty() && (t1_ticks >= wakeTime + 5000) ){
-        //Idle();
-        //LED_RED = 0;
-        //gyroSleep();
-        //Sleep();
-        //}
-    }
-
-    /*
-    if(g_radio_duty_cycle){
-            if(dcCounter == 0){
-                    //LED_GREEN = 1;
-                    atSetRXAACKON();
-            }else{
-                    //LED_GREEN = 0;
-                    atSetTRXOFF();
-            }
-    }
-    else{
-            //LED_GREEN = 1;
-    }
-
-    dcCounter = (dcCounter + 1) % 8;
-		
-    if(radioIsRxQueueEmpty() && !inMotion){
-            //gyroSleep();
-            LED_RED = 0;
-            _SWDTEN = 1; //restart wdt
-            Sleep();
-            //Idle();
-    }
-		
-    //should be asleep here, waiting for WTD wakeup
-    ClrWdt(); //clear wdt
-    _SWDTEN = 0; //software disable wdt
-    LED_RED = 1;
-
-    //spin up clock
-    if(_COSC != 0b010){
-            while(OSCCONbits.LOCK!=1);
-    }
-    //gyroWake();
-    }*/
+    return 0;
 }
