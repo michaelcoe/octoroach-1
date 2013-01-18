@@ -40,7 +40,7 @@
  * Usage:
  *  EmergencyStop();
  * 	//Reset robot by sending cmdSoftwareReset(...)
- *  
+ *
  */
 
 #include "pwm.h"
