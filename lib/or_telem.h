@@ -20,8 +20,6 @@ typedef struct {
     int steerIn;
     int steerOut;
     int Vbatt;
-    unsigned long motor_count[2];
-    float yawAngle;
 } orTelemStruct_t;
 
 void orTelemGetData(unsigned char* ptr);

@@ -118,7 +118,7 @@ def main():
     #    0, 0, 2000,   MOVE_SEG_CONSTANT, 0,  0,  0, STEER_MODE_OFF, 0]    
      
     #trapezoidal velocity profile
-    [numMoves, moveq1] = trapRun(topspeed = 300, tstime = 1000, acceltime=1000, deceltime=1000,steertype = STEER_MODE_YAW_SPLIT)
+    [numMoves, moveq1] = trapRun(topspeed = 500, tstime = 3000, acceltime=500, deceltime=500,steertype = STEER_MODE_YAW_SPLIT)
     
 
     #Timing settings
@@ -138,6 +138,7 @@ def main():
     print "  ***************************"
     raw_input("  Press ENTER to start run ...")
     print ""
+    time.sleep(1)
     
     # Trigger telemetry save, which starts as soon as it is received
     

@@ -34,20 +34,14 @@ void orTelemGetData(unsigned char* ptr) {
     tptr->gyroY = imuGetGyroYValue();
     tptr->gyroZ = imuGetGyroZValue();
     tptr->gyroAvg = imuGetGyroZValueAvgDeg();
-    tptr->accelX = 0;
-    tptr->accelY = 0;
-    tptr->accelZ = 0;
-    tptr->accelX = 0;
-    tptr->accelY = 0;
-    tptr->accelZ = 0;
+    tptr->accelX = imuGetXLXValue();
+    tptr->accelY = imuGetXLYValue();
+    tptr->accelZ = imuGetXLZValue();
     tptr->bemfL = bemf[0];
     tptr->bemfR = bemf[1];
     tptr->Vbatt = adcGetVBatt();
     tptr->steerIn = steeringPID.input;
     tptr->steerOut = steeringPID.output;
-    tptr->motor_count[0] = 0;
-    tptr->motor_count[1] = 0;
-    tptr->yawAngle = imuGetBodyZPositionDeg();
 }
 
 //This may be unneccesary, since the telemtry type isn't totally anonymous

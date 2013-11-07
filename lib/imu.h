@@ -10,6 +10,7 @@
 
 void imuSetup(); // to be called in main
 
+///// Gyro
 int imuGetGyroXValue();
 int imuGetGyroYValue();
 int imuGetGyroZValue();
@@ -17,6 +18,10 @@ int imuGetGyroZValue();
 float imuGetGyroXValueDeg();
 float imuGetGyroYValueDeg();
 float imuGetGyroZValueDeg();
+
+int imuGetXLXValue();
+int imuGetXLYValue();
+int imuGetXLZValue();
 
 int imuGetGyroZValueAvg();
 float imuGetGyroZValueAvgDeg();

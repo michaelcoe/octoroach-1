@@ -1,0 +1,1004 @@
+diff --git a/firmware/nbproject/configurations.xml b/firmware/nbproject/configurations.xml
+index 5bcd493..3784898 100644
+--- a/firmware/nbproject/configurations.xml
++++ b/firmware/nbproject/configurations.xml
+@@ -10,28 +10,22 @@
+         <itemPath>../../imageproc-lib/xl.h</itemPath>
+         <itemPath>../../imageproc-lib/utils.h</itemPath>
+         <itemPath>../../imageproc-lib/payload.h</itemPath>
+-        <itemPath>../../imageproc-lib/payload_queue.h</itemPath>
+-        <itemPath>../../imageproc-lib/packet_queue.h</itemPath>
+         <itemPath>../../imageproc-lib/queue.h</itemPath>
+-        <itemPath>../../imageproc-lib/at86rf.h</itemPath>
+         <itemPath>../../imageproc-lib/at86rf231.h</itemPath>
+-        <itemPath>../../imageproc-lib/ipspi1.h</itemPath>
+         <itemPath>../../imageproc-lib/radio.h</itemPath>
+         <itemPath>../../imageproc-lib/init_default.h</itemPath>
+         <itemPath>../../imageproc-lib/dfilter_avg.h</itemPath>
+         <itemPath>../../imageproc-lib/gyro.h</itemPath>
+         <itemPath>../../imageproc-lib/pid_hw.h</itemPath>
+-        <itemPath>../../imageproc-lib/stopwatch.h</itemPath>
+         <itemPath>../../imageproc-lib/pid.h</itemPath>
++        <itemPath>../../imageproc-lib/ppool.h</itemPath>
+       </logicalFolder>
+       <logicalFolder name="lib" displayName="lib" projectFiles="true">
+-        <itemPath>../lib/adc_pid.h</itemPath>
+         <itemPath>../lib/motor_ctrl.h</itemPath>
+         <itemPath>../lib/cmd_const.h</itemPath>
+         <itemPath>../lib/flashmem.h</itemPath>
+         <itemPath>../lib/move_queue.h</itemPath>
+         <itemPath>../lib/steering.h</itemPath>
+-        <itemPath>../lib/sensors.h</itemPath>
+         <itemPath>../lib/estop.h</itemPath>
+         <itemPath>../lib/telem.h</itemPath>
+         <itemPath>../../imageproc-lib/dfmem.h</itemPath>
+@@ -41,7 +35,10 @@
+         <itemPath>../lib/tail_ctrl.h</itemPath>
+         <itemPath>../lib/sys_service.h</itemPath>
+         <itemPath>../lib/hall.h</itemPath>
+-        <itemPath>../lib/ams-enc.h</itemPath>
++        <itemPath>../lib/imu.h</itemPath>
++        <itemPath>../../imageproc-lib/spi_controller.h</itemPath>
++        <itemPath>../lib/led.h</itemPath>
++        <itemPath>../lib/or_telem.h</itemPath>
+       </logicalFolder>
+       <itemPath>source/cmd.h</itemPath>
+       <itemPath>source/settings.h</itemPath>
+@@ -58,11 +55,8 @@
+                      projectFiles="true">
+         <itemPath>../../imageproc-lib/xl.c</itemPath>
+         <itemPath>../../imageproc-lib/battery.c</itemPath>
+-        <itemPath>../../imageproc-lib/packet_queue.c</itemPath>
+         <itemPath>../../imageproc-lib/queue.c</itemPath>
+-        <itemPath>../../imageproc-lib/payload.c</itemPath>
+         <itemPath>../../imageproc-lib/radio.c</itemPath>
+-        <itemPath>../../imageproc-lib/payload_queue.c</itemPath>
+         <itemPath>../../imageproc-lib/init_default.c</itemPath>
+         <itemPath>../../imageproc-lib/dfmem.c</itemPath>
+         <itemPath>../../imageproc-lib/i2c_driver.c</itemPath>
+@@ -71,17 +65,18 @@
+         <itemPath>../../imageproc-lib/pid_hw.c</itemPath>
+         <itemPath>../../imageproc-lib/pid.c</itemPath>
+         <itemPath>../../imageproc-lib/version.c</itemPath>
+-        <itemPath>../../imageproc-lib/ams-enc.c</itemPath>
+         <itemPath>../../imageproc-lib/sclock.c</itemPath>
+-        <itemPath>../../imageproc-lib/ppool.c</itemPath>
+-        <itemPath>../../imageproc-lib/carray.c</itemPath>
++        <itemPath>../lib/debugpins.c</itemPath>
+         <itemPath>../../imageproc-lib/spi_controller.c</itemPath>
++        <itemPath>../../imageproc-lib/ams-enc.c</itemPath>
+         <itemPath>../../imageproc-lib/at86rf231_driver.c</itemPath>
++        <itemPath>../../imageproc-lib/payload.c</itemPath>
++        <itemPath>../../imageproc-lib/carray.c</itemPath>
++        <itemPath>../../imageproc-lib/ppool.c</itemPath>
+         <itemPath>../../imageproc-lib/mac_packet.c</itemPath>
+       </logicalFolder>
+       <logicalFolder name="lib" displayName="lib" projectFiles="true">
+         <itemPath>../../imageproc-lib/delay.s</itemPath>
+-        <itemPath>../lib/adc_pid.c</itemPath>
+         <itemPath>../lib/motor_ctrl.c</itemPath>
+         <itemPath>../lib/traps.c</itemPath>
+         <itemPath>../lib/move_queue.c</itemPath>
+@@ -95,6 +90,7 @@
+         <itemPath>../lib/hall.c</itemPath>
+         <itemPath>../lib/imu.c</itemPath>
+         <itemPath>../lib/or_telem.c</itemPath>
++        <itemPath>../lib/adc_pid.c</itemPath>
+       </logicalFolder>
+       <itemPath>source/cmd.c</itemPath>
+       <itemPath>source/main.c</itemPath>
+@@ -632,6 +628,7 @@
+         <property key="extra-include-directories"
+                   value="../lib;../../imageproc-lib;source"/>
+         <property key="isolate-each-function" value="false"/>
++        <property key="keep-inline" value="false"/>
+         <property key="oXC16gcc-align-arr" value="false"/>
+         <property key="oXC16gcc-cnsts-mauxflash" value="false"/>
+         <property key="oXC16gcc-data-sects" value="false"/>
+@@ -651,6 +648,7 @@
+         <property key="pre-instruction-scheduling" value="default"/>
+         <property key="preprocessor-macros" value=""/>
+         <property key="scalar-model" value="default"/>
++        <property key="use-cci" value="false"/>
+       </C30>
+       <C30-AS>
+         <property key="assembler-symbols" value=""/>
+@@ -672,6 +670,7 @@
+         <appendMe value="-g "/>
+       </C30-AS>
+       <C30-LD>
++        <property key="additional-options-use-response-files" value="false"/>
+         <property key="boot-eeprom" value="no_eeprom"/>
+         <property key="boot-flash" value="no_flash"/>
+         <property key="boot-ram" value="no_ram"/>
+diff --git a/firmware/source/main.c b/firmware/source/main.c
+index 36ada9a..aed452c 100644
+--- a/firmware/source/main.c
++++ b/firmware/source/main.c
+@@ -9,9 +9,9 @@
+  is invalid and void.
+  *******************************************************************************/
+ 
+-#include <xc.h>
+ #include "settings.h"
+ #include "Generic.h"
++#include "p33Fxxxx.h"
+ #include "init_default.h"
+ #include "ports.h"
+ #include "battery.h"
+@@ -31,7 +31,7 @@
+ #include "telem.h"
+ #include "hall.h"
+ #include "tail_ctrl.h"
+-#include "ams-enc.h"
++//#include "ams-enc.h"
+ #include "imu.h"
+ #include "spi_controller.h"
+ #include "ppool.h"
+diff --git a/firmware/source/settings.h b/firmware/source/settings.h
+index 7037288..67c746a 100644
+--- a/firmware/source/settings.h
++++ b/firmware/source/settings.h
+@@ -18,13 +18,6 @@
+ //Hard-coded destination address, must match basestation or XBee addr
+ #define RADIO_DST_ADDR		0x2051
+ 
+-
+-//  Ron's + DZ's radio settings:
+-//#define RADIO_CHANNEL		0x13
+-//#define RADIO_SRC_ADDR 		0x2052
+-//#define RADIO_PAN_ID  		0x2060
+-//#define RADIO_DST_ADDR		0x2011
+-
+ #define RADIO_RXPQ_MAX_SIZE 	20
+ #define RADIO_TXPQ_MAX_SIZE	60
+ 
+diff --git a/lib/hall.h b/lib/hall.h
+index dd46239..afd8f3c 100644
+--- a/lib/hall.h
++++ b/lib/hall.h
+@@ -28,8 +28,7 @@
+ #define HALFTHROT 2000
+ #define FULLTHROT 2*HALFTHROT
+ //#define MAXTHROT 3976
+-//#define SATTHROT (int)((3976.0/4000.0)*(float)FULLTHROT)
+-#define SATTHROT (int)((3980.0/4000.0)*(float)FULLTHROT)
++#define SATTHROT (int)((3976.0/4000.0)*(float)FULLTHROT)
+ 
+ 
+ //Structures and enums
+diff --git a/lib/imu.c b/lib/imu.c
+index c0b9f42..724e677 100644
+--- a/lib/imu.c
++++ b/lib/imu.c
+@@ -69,25 +69,21 @@ static void imuISRHandler(){
+         lastGyroZValue = gyroData[2];
+ 
+         //Threshold:
+-        /*
++        
+         if((lastGyroXValue < GYRO_DRIFT_THRESH) && (lastGyroXValue > -GYRO_DRIFT_THRESH)){
+             lastGyroXValue = lastGyroXValue >> 1; //fast divide by 2
+         }
+-
+         if((lastGyroYValue < GYRO_DRIFT_THRESH) && (lastGyroYValue > -GYRO_DRIFT_THRESH)){
+             lastGyroYValue = lastGyroYValue >> 1; //fast divide by 2
+         }
+-        */
+         if((lastGyroZValue < GYRO_DRIFT_THRESH) && (lastGyroZValue > -GYRO_DRIFT_THRESH)){
+             lastGyroZValue = lastGyroZValue >> 1; //fast divide by 2
+         }
+         
+-        /*
++
+         lastGyroXValueDeg = (float) (lastGyroXValue*LSB2DEG);
+         lastGyroYValueDeg = (float) (lastGyroYValue*LSB2DEG);
+-        */
+-        lastGyroZValueDeg = (float) (lastGyroZValue*LSB2DEG);
+-
++        lastGyroZValueDeg = (float) (lastGyroZValue*LSB2DEG); 
+ 
+         dfilterAvgUpdate(&gyroZavg, gyroData[2]);
+ 
+diff --git a/lib/leg_ctrl.c b/lib/leg_ctrl.c
+index ea99f11..01dc848 100644
+--- a/lib/leg_ctrl.c
++++ b/lib/leg_ctrl.c
+@@ -253,9 +253,9 @@ void updateBEMF() {
+     //Simple indicator if a leg is "in motion", via the yellow LED.
+     //Not functionally necceasry; can be elimited to use the LED for something else.
+     if ((bemf[0] > 0) || (bemf[1] > 0)) {
+-        //LED_YELLOW = 1;  //Changed to DC indicator for STAR robot
++        LED_YELLOW = 1;
+     } else {
+-        //LED_YELLOW = 0;
++        LED_YELLOW = 0;
+     }
+ }
+ 
+diff --git a/lib/leg_ctrl.h b/lib/leg_ctrl.h
+index eabdd86..f43a550 100644
+--- a/lib/leg_ctrl.h
++++ b/lib/leg_ctrl.h
+@@ -6,8 +6,7 @@
+ #define HALFTHROT 2000
+ #define FULLTHROT 2*HALFTHROT
+ //#define MAXTHROT 3976
+-//#define SATTHROT (int)((3976.0/4000.0)*(float)FULLTHROT)
+-#define SATTHROT (int)((3980.0/4000.0)*(float)FULLTHROT)
++#define SATTHROT (int)((3976.0/4000.0)*(float)FULLTHROT)
+ 
+ #define NUM_MOTOR_PIDS 2
+ 
+diff --git a/lib/motor_ctrl.c b/lib/motor_ctrl.c
+index 7ae1d8f..b8aea9e 100644
+--- a/lib/motor_ctrl.c
++++ b/lib/motor_ctrl.c
+@@ -41,17 +41,9 @@ void mcSetup(void) {
+ void mcSetDutyCycle(unsigned char channel, float duty_cycle) {
+ 
+     unsigned int pdc_value;
+-
+-    //LED indicator
+-    if((duty_cycle > 90.0) || (duty_cycle < -90.0)){
+-        LED_YELLOW = 1;
+-    }
+-    else{
+-        LED_YELLOW = 0;
+-    }
+-
+-    pdc_value = (unsigned int) (2.0 * duty_cycle / 100.0 * pwmPeriod);
++    pdc_value = (unsigned int) (2 * duty_cycle / 100 * pwmPeriod);
+     SetDCMCPWM(channel, pdc_value, 0);
++
+ }
+ 
+ void mcThrust(float value) {
+@@ -130,9 +122,9 @@ static void mcSetupPeripheral(void) {
+ 
+     //////////// APULLIN ///////////
+     
+-    unsigned int PTPERvalue = 2000;
++     unsigned int PTPERvalue = 2000;
+     unsigned int SEVTCMPvalue, PTCONvalue, PWMCON1value, PWMCON2value;
+-    SEVTCMPvalue = 1980;
++    SEVTCMPvalue = 1988;
+     //    SEVTCMPvalue = 160; // Special Event Trigger Compare Value for ADC in phase with PWM
+     //PTCONvalue = PWM_EN & PWM_IDLE_CON & PWM_OP_SCALE1 &
+     //             PWM_IPCLK_SCALE4 & PWM_MOD_FREE;
+@@ -145,5 +137,5 @@ static void mcSetupPeripheral(void) {
+     OpenMCPWM(PTPERvalue, SEVTCMPvalue, PTCONvalue, PWMCON1value, PWMCON2value);
+     SetDCMCPWM(1, 0, 0);
+     SetDCMCPWM(2, 0, 0);
+-    pwmPeriod = PTPERvalue;
++     
+ }
+diff --git a/lib/or_telem.c b/lib/or_telem.c
+index 5a82e25..4b823c4 100644
+--- a/lib/or_telem.c
++++ b/lib/or_telem.c
+@@ -21,7 +21,6 @@ extern pidObj motor_pidObjs[NUM_MOTOR_PIDS];
+ extern int bemf[NUM_MOTOR_PIDS];
+ extern pidObj steeringPID;
+ extern pidObj tailPID;
+-extern float lastTailPos;
+ 
+ void orTelemGetData(unsigned char* ptr) {
+     /////// Get XL data
+@@ -30,7 +29,7 @@ void orTelemGetData(unsigned char* ptr) {
+     tptr->inputL = motor_pidObjs[0].input;
+     tptr->inputR = motor_pidObjs[1].input;
+     tptr->dcL = PDC1;
+-    tptr->dcR = PDC4;
++    tptr->dcR = PDC2;
+     tptr->gyroX = imuGetGyroXValue();
+     tptr->gyroY = imuGetGyroYValue();
+     tptr->gyroZ = imuGetGyroZValue();
+@@ -38,6 +37,9 @@ void orTelemGetData(unsigned char* ptr) {
+     tptr->accelX = 0;
+     tptr->accelY = 0;
+     tptr->accelZ = 0;
++    tptr->accelX = 0;
++    tptr->accelY = 0;
++    tptr->accelZ = 0;
+     tptr->bemfL = bemf[0];
+     tptr->bemfR = bemf[1];
+     tptr->Vbatt = adcGetVBatt();
+@@ -46,10 +48,6 @@ void orTelemGetData(unsigned char* ptr) {
+     tptr->motor_count[0] = 0;
+     tptr->motor_count[1] = 0;
+     tptr->yawAngle = imuGetBodyZPositionDeg();
+-    tptr->dcH1 = PDC2;
+-    tptr->dcH2 = PDC3;
+-    tptr->sprawlAngle = lastTailPos;
+-    tptr->sprawlInput = tailPID.input;
+ }
+ 
+ //This may be unneccesary, since the telemtry type isn't totally anonymous
+diff --git a/lib/or_telem.h b/lib/or_telem.h
+index c8d4d15..6340296 100644
+--- a/lib/or_telem.h
++++ b/lib/or_telem.h
+@@ -22,10 +22,6 @@ typedef struct {
+     int Vbatt;
+     unsigned long motor_count[2];
+     float yawAngle;
+-    int dcH1;
+-    int dcH2;
+-    float sprawlAngle;
+-    int sprawlInput;
+ } orTelemStruct_t;
+ 
+ void orTelemGetData(unsigned char* ptr);
+diff --git a/lib/tail_ctrl.c b/lib/tail_ctrl.c
+index 2118c44..c4c7d40 100644
+--- a/lib/tail_ctrl.c
++++ b/lib/tail_ctrl.c
+@@ -1,4 +1,4 @@
+-//tail_ctrl.c
++// Contents of this file are copyright Andrew Pullin, 2013
+ 
+ #include "tail_ctrl.h"
+ #include "pid.h"
+@@ -9,7 +9,7 @@
+ #include "math.h"
+ #include "sys_service.h"
+ #include "move_queue.h"
+-#include "ams-enc.h"
++//#include "ams-enc.h"
+ #include "motor_ctrl.h"
+ #include "gyro.h"
+ #include "dfilter_avg.h"
+@@ -27,7 +27,8 @@
+ #define MAXTAILPOSITION 130.0
+ #define MINTAILPOSITION -115.0
+ 
+-#define TAIL_OFFSET_ANGLE 21.0
++//#define MAXTAILPOSITION 120.0
++//#define MINTAILPOSITION -100.0
+ 
+ 
+ //PID container objects
+@@ -61,7 +62,7 @@ float initialBodyPosition = 0.0;
+ int gyroCtrlTorque;
+ int tailCtrlFlag = 0;
+ 
+-
++ 
+ 
+ //Function to be installed into T1, and setup function
+ static void SetupTimer1(void);
+@@ -73,6 +74,13 @@ static void serviceTailPID();
+ 
+ //volatile char tailInMotion;
+ 
++/////////        Leg Control ISR       ////////
++/////////  Installed to Timer1 @ 1Khz  ////////
++//void __attribute__((interrupt, no_auto_psv)) _T1Interrupt(void) {
++
++
++
++
+ static void tailCtrlServiceRoutine(void) {
+     serviceTailQueue(); //Update controllers
+     tailSynth();
+@@ -103,7 +111,7 @@ static void SetupTimer1(void) {
+ void tailCtrlSetup() {
+ 
+     SetupTimer1(); // Timer 1 @ 1 Khz
+-
++    
+ 
+     //Tail queue
+     tailq = tailqInit(16);
+@@ -134,7 +142,7 @@ void tailCtrlSetup() {
+ 
+ 	int retval;
+     retval = sysServiceInstallT1(tailCtrlServiceRoutine);
+-
++ 
+ }
+ 
+ 
+@@ -152,7 +160,8 @@ static void serviceTailQueue(void) {
+ 
+             //If we are no on an Idle move, turn on controllers
+             if (currentTail->type != TAIL_SEG_IDLE) {
+-		tailPID.onoff = PID_ON;
++                //TODO: Turn on tail controller
++				tailPID.onoff = PID_ON;
+             }
+         }
+     }//Move Queue is empty
+@@ -160,8 +169,8 @@ static void serviceTailQueue(void) {
+         //No more moves, go back to idle
+         currentTail = idleTail;
+         //TODO: Zero tail torque, turn off controller
+-        tailPID.onoff = PID_OFF;
+-        tailPID.output = 0;
++		tailPID.onoff = PID_OFF;
++		tailPID.output = 0;
+         tailExpire = 0;
+     }
+ }
+@@ -170,80 +179,82 @@ static void tailSynth() {
+ 
+     //int gyroAvg[3]; int gyroData[3]; int gyroOffsets[3];
+     //Move segment synthesis
+-    long yS = (int) (10.0 * currentTail->angle); //store in local variable to limit lookups
++    long yS = (int) (10.0*currentTail->angle); //store in local variable to limit lookups
+     int y = 0;
+-    if (currentTail->type == TAIL_SEG_IDLE) {
+-        y = 0;
+-        tailPID.onoff = PID_OFF;
+-    }
+-    if (currentTail->type == TAIL_SEG_CONSTANT) {
+-        y = yS;
+-    }
+-    if (currentTail->type == TAIL_SEG_RAMP) {
+-        long rate = (long) currentTail->params[0];
+-        //Do division last to prevent integer math underflow
+-        y = rate * ((long) getT1_ticks() - (long) currentTailStart) / 1000 + yS;
+-    }
+-    if (currentTail->type == TAIL_SEG_SIN) {
+-        //float temp = 1.0/1000.0;
+-        float amp = (float) currentTail->params[0];
+-        //float F = (float)currentMove->params[1] / 1000;
+-        float F = (float) currentTail->params[1] * 0.001;
+-#define BAMS16_TO_FLOAT 1/10430.367658761737
+-        float phase = BAMS16_TO_FLOAT * (float) currentTail->params[2]; //binary angle
+-        float fy = amp * sin(2 * 3.1415 * F * (float) (getT1_ticks() -
+-                currentTailStart)*0.001 - phase) + yS;
+-
+-        //Clipping
+-        int temp = (int) fy;
+-        if (temp < 0) {
+-            temp = 0;
++        if (currentTail->type == TAIL_SEG_IDLE) {
++            y = 0;
++			tailPID.onoff = PID_OFF;
+         }
+-
+-        y = (unsigned int) temp;
+-    }
+-
+-    // New code July 31 2012
+-
+-    //turn the tail until the body reaches a reference position
+-    if (currentTail->type == TAIL_GYRO_CONTROL) {
+-        //Set PID input to zero, turn PID off
+-        y = 0;
+-        tailPID.onoff = PID_OFF;
+-
+-        //Throw a flag so you don't use the PID control
+-        tailCtrlFlag = 1;
+-
+-
+-
+-        refBodyPosition = (float) currentTail->params[0];
+-        // nothing
+-        bodyPosition = imuGetBodyZPositionDeg(); // - initialBodyPosition;
+-
+-        if (bodyPosition < (refBodyPosition - bodyPosDeadband)) {
+-            gyroCtrlTorque = POS;
+-        } else if (bodyPosition > (refBodyPosition + bodyPosDeadband)) {
+-            gyroCtrlTorque = NEG;
+-        } else {
+-            gyroCtrlTorque = ZERO;
++        if (currentTail->type == TAIL_SEG_CONSTANT) {
++            y = yS;
+         }
++        if (currentTail->type == TAIL_SEG_RAMP) {
++            long rate = (long) currentTail->params[0];
++            //Do division last to prevent integer math underflow
++            y = rate * ((long) getT1_ticks() - (long) currentTailStart) / 1000 + yS;
++        }
++        if (currentTail->type == TAIL_SEG_SIN) {
++            //float temp = 1.0/1000.0;
++            float amp = (float) currentTail->params[0];
++            //float F = (float)currentMove->params[1] / 1000;
++            float F = (float) currentTail->params[1] * 0.001;
++#define BAMS16_TO_FLOAT 1/10430.367658761737
++            float phase = BAMS16_TO_FLOAT * (float) currentTail->params[2]; //binary angle
++            float fy = amp * sin(2 * 3.1415 * F * (float) (getT1_ticks() -
++                    currentTailStart)*0.001 - phase) + yS;
++			
++            //Clipping
++            int temp = (int) fy;
++            if (temp < 0) {
++                temp = 0;
++            }
+ 
+-        // if tail angle is at a max or min, apply no torque
+-        /* if (lastTailPos < MINTAILPOSITION) {
+-             gyroCtrlTorque = ZERO;
+-         }
+-
+-          if (lastTailPos > MAXTAILPOSITION) {
+-             gyroCtrlTorque = ZERO;
+-         }
+-         */
+-    }
+-
+-
+-
+-    //TODO: Set tail input here
+-    tailPID.input = y;
++            y = (unsigned int) temp;
++        }
+ 
++		// New code July 31 2012
++
++		//turn the tail until the body reaches a reference position
++		if (currentTail->type == TAIL_GYRO_CONTROL) {
++			//Set PID input to zero, turn PID off
++			y = 0;
++			tailPID.onoff = PID_OFF;
++			
++			//Throw a flag so you don't use the PID control
++			tailCtrlFlag = 1;
++
++
++
++			refBodyPosition = (float) currentTail->params[0];
++                            // nothing
++			bodyPosition = imuGetBodyZPositionDeg();// - initialBodyPosition;
++
++			if (bodyPosition < (refBodyPosition - bodyPosDeadband)) {
++				gyroCtrlTorque = POS; 
++			}	
++                        else if (bodyPosition > (refBodyPosition + bodyPosDeadband)) {
++				gyroCtrlTorque = NEG; 
++			}
++                        else {
++                            gyroCtrlTorque = ZERO;
++                        }
++
++			// if tail angle is at a max or min, apply no torque
++                       /* if (lastTailPos < MINTAILPOSITION) {
++                            gyroCtrlTorque = ZERO;
++                        }
++
++                         if (lastTailPos > MAXTAILPOSITION) {
++                            gyroCtrlTorque = ZERO;
++                        }
++                        */
++                        }
++			
++ 
++                        
++        //TODO: Set tail input here
++        tailPID.input = y;
++    
+     //Note here that pidObjs[n].input is not set if !inMotion, in case another behavior wants to
+     // set it.
+ }
+@@ -256,31 +267,24 @@ void tailCtrlOnOff(unsigned char state) {
+     tailPID.onoff = state;
+ }
+ 
+-void tailCtrlSetInput(int val) {
++void tailCtrlSetInput(int val){
+     pidSetInput(&tailPID, val);
+ }
+ 
+-static void serviceTailPID() {
+ 
+-    //update tail position
+-    //lastTailPos = encGetAux1Pos();
+-    lastTailPos = encGetFloatPos(0);
+ 
+-    // Angle offset and branching
+-    lastTailPos = -lastTailPos + TAIL_OFFSET_ANGLE;
+-    if (lastTailPos <= -180.0) {
+-        lastTailPos += 360.0;
+-    } else if (lastTailPos > 180.0) {
+-        lastTailPos -= 360.0;
+-    }
++static void serviceTailPID() {
+ 
+-    //Scaling and convertion to int type for DSP PID controller
+-    int encAngle = (int) (lastTailPos * 10.0);
+-    //Update the setpoints
++	//update tail position
++	//lastTailPos = encGetFloatPos(4);
++	
++	int encAngle = (int) (lastTailPos*10.0);
++	//Update the setpoints
+     //if((currentMove->inputL != 0) && (currentMove->inputR != 0)){
+     if (currentTail != idleTail) {
+         //Only update steering controller if we are in motion
+ 
++
+ #ifdef PID_SOFTWARE
+         pidUpdate(&tailPID, encAngle);
+ #elif defined PID_HARDWARE
+@@ -288,28 +292,30 @@ static void serviceTailPID() {
+         temp = tailPID.input; //Save unscaled input val
+         tailPID.input *= TAIL_PID_SCALER; //Scale input
+         pidUpdate(&tailPID,
+-                TAIL_PID_SCALER * encAngle); //Update with scaled feedback, sets tailPID.output
+-        tailPID.input = temp; //Reset unscaled input
+-#endif   //PID_SOFTWWARE vs PID_HARDWARE
++                 TAIL_PID_SCALER * encAngle); //Update with scaled feedback, sets tailPID.output
++       tailPID.input = temp;  //Reset unscaled input
++		
+ 
++#endif   //PID_SOFTWWARE vs PID_HARDWARE
+ 
+-    } else {
+-        tailPID.output = 0; //no output if idling
++	
++	}
++	else {
++		tailPID.output = 0; //no output if idling
+     }
+ 
+-    //Clipping, +- 100.0
+-    tailTorque = tailPID.output*PIDOUT2HBRIDGETORQUE;
++	tailTorque = tailPID.output*PIDOUT2HBRIDGETORQUE;
+ 
+-    if (tailTorque > 100.0) {
+-        tailTorque = 100.0;
+-    }
++	if(tailTorque > 100.0) {
++		tailTorque = 100.0;
++	}
+ 
+-    if (tailTorque < -100.0) {
+-        tailTorque = -100.0;
+-    }
++	if(tailTorque < -100.0) {
++		tailTorque = -100.0;
++	}
+ 
+-
+-    if (tailCtrlFlag == 1) {
++	
++	if (tailCtrlFlag == 1) {
+ 
+         // HOW DO I DO THIS "AND" CORRECTLY IN C
+ 
+@@ -332,3 +338,4 @@ static void serviceTailPID() {
+     } //if tailCtrlFlag == 1
+ 
+ }
++
+diff --git a/lib/tail_ctrl.h b/lib/tail_ctrl.h
+index 9c21bcb..e9d9d95 100644
+--- a/lib/tail_ctrl.h
++++ b/lib/tail_ctrl.h
+@@ -14,12 +14,12 @@
+ #define TAIL_DEFAULT_KFF  0
+ #define SOFT_GAIN_SCALER 512
+ #elif defined PID_HARDWARE
+-#define TAIL_DEFAULT_KP  5000
++#define TAIL_DEFAULT_KP  500
+ #define TAIL_DEFAULT_KI  50
+ #define TAIL_DEFAULT_KD  0
+ #define TAIL_DEFAULT_KAW 0
+ #define TAIL_DEFAULT_KFF  0
+-#define TAIL_PID_SCALER 16
++#define TAIL_PID_SCALER 8
+ #endif
+ 
+ 
+diff --git a/lib/telem.c b/lib/telem.c
+index f72310b..4ebf34a 100644
+--- a/lib/telem.c
++++ b/lib/telem.c
+@@ -22,7 +22,7 @@
+ #if defined(__RADIO_HIGH_DATA_RATE)
+ #define READBACK_DELAY_TIME_MS 3
+ #else
+-#define READBACK_DELAY_TIME_MS 10
++#define READBACK_DELAY_TIME_MS 9
+ #endif
+ 
+ telemStruct_t telemBuffer;
+@@ -140,11 +140,11 @@ void telemSendDataDelay(telemStruct_t* sample, int delaytime_ms) {
+     Payload pld = macGetPayload(pkt);
+ 
+     paySetData(pld, telemPacketSize, (unsigned char*) sample);
+-    paySetType(pld, CMD_SPECIAL_TELEMETRY);
++    paySetType(pld, CMD_SPECIAL_TELEMETRY); 
+     paySetStatus(pld, 0);
+ 
+     //Force immediate send
+-    while(!radioEnqueueTxPacket(pkt)) {
++    while(!radioEnqueueTxPacket(pkt)) { 
+         radioReturnPacket(pkt);	// Delete packet if append fails
+     }
+ 
+@@ -158,7 +158,7 @@ void telemSendDataDelay(telemStruct_t* sample, int delaytime_ms) {
+ //Saves telemetry data structure into flash memory, in order
+ 
+ void telemSaveData(telemStruct_t * telemPkt) {
+-
++    
+     //Write the packet header info to the DFMEM
+     dfmemSave((unsigned char*) telemPkt, sizeof(telemStruct_t));
+     samplesToSave--;
+@@ -261,7 +261,7 @@ static void telemISRHandler() {
+                 //Write telemetry data into packet
+                 TELEMPACKFUNC((unsigned char*) &(telemBuffer.telemData));
+                 sampIdx++;
+-
++                
+                 radioSendData(RADIO_DST_ADDR, 0, CMD_STREAM_TELEMETRY,
+                         telemPacketSize, (unsigned char*)(&telemBuffer), 0);
+ 
+diff --git a/python/callbackFunc.py b/python/callbackFunc.py
+index deb4882..dcb7613 100644
+--- a/python/callbackFunc.py
++++ b/python/callbackFunc.py
+@@ -27,7 +27,7 @@ pktFormat = { \
+     command.SET_MOVE_QUEUE:         '', \
+     command.SET_STEERING_GAINS:     '6h', \
+     command.SOFTWARE_RESET:         '', \
+-    command.SPECIAL_TELEMETRY:      '=LLhhhhhhhhhhhhhhhhLLfhhfh', \
++    command.SPECIAL_TELEMETRY:      '=LLhhhhhhhhhhhhhhhhLLf', \
+     command.ERASE_SECTORS:          'L', \
+     command.FLASH_READBACK:         '', \
+     command.SLEEP:                  'b', \
+diff --git a/python/download_telem.py b/python/download_telem.py
+index cc03cbc..650ea85 100644
+--- a/python/download_telem.py
++++ b/python/download_telem.py
+@@ -37,7 +37,7 @@ def main():
+ 
+     numToDL = raw_input("How many samples to download? ")
+     
+-    if numToDL > 0 and numToDL != '':
++    if numToDL > 0:
+         R1.numSamples = int(numToDL)
+         R1.imudata = [ [] ] * R1.numSamples
+         R1.runtime = 'UNKNOWN'
+diff --git a/python/experiment.py b/python/experiment.py
+index bcdfd8d..8405359 100644
+--- a/python/experiment.py
++++ b/python/experiment.py
+@@ -47,8 +47,7 @@ def main():
+     #    ----------LEFT----------        ---------_RIGHT----------
+     
+     #motorgains = [15000,50,1000,0,0,    15000,50,1000,0,0] #Hardware PID
+-    #motorgains = [15000,50,1000,0,0,    15000,50,1000,0,0]
+-    motorgains = [32000,100,0,0,0,    32000,100,0,0,0]
++    motorgains = [15000,50,1000,0,0,    15000,50,1000,0,0]
+ 
+     R1.setMotorGains(motorgains, retries = 8)
+     #Verify all robots have motor gains set
+@@ -56,7 +55,7 @@ def main():
+ 
+     #Steering gains format:
+     #  [ Kp , Ki , Kd , Kaw , Kff]
+-    steeringGains = [11000,10,0,0,0,  STEER_MODE_SPLIT] # Hardware PID
++    steeringGains = [15000,5,0,0,0,  STEER_MODE_SPLIT] # Hardware PID
+ 
+     R1.setSteeringGains(steeringGains, retries = 8)
+     #Verify all robots have steering gains set
+@@ -94,14 +93,13 @@ def main():
+     # MOVE_SEG_QFLUSH  : Flushes all following items in move queue. value1,value2, and params have no effect.
+              
+     #YAW control: Straight then -90 degree turn 
+-    #numMoves = 3
++    #numMoves = 5
+     #moveq1 = [numMoves, \
+-    #    0, 0, 1000,   MOVE_SEG_RAMP, 600, 600,  0, STEER_MODE_YAW_DEC, int(round(shared.deg2count*0.0)),
+-    #    600, 600, 2000,   MOVE_SEG_CONSTANT, 0,  0,  0, STEER_MODE_YAW_DEC, int(round(shared.deg2count*0.0)),
+-    #    600, 600, 1000,   MOVE_SEG_CONSTANT, -600,  -600,  0, STEER_MODE_YAW_DEC, int(round(shared.deg2count*0.0))]
+-    
+-    #trapezoidal velocity profile
+-    [numMoves, moveq1] = trapRun(topspeed = 300, tstime = 2000, acceltime=500, deceltime=500,steertype = STEER_MODE_DECREASE)
++    #    0, 0, 500,   MOVE_SEG_RAMP, 30, 30,  0, STEER_MODE_YAW_SPLIT, int(round(shared.deg2count*0.0)),
++    #    60, 60, 2000,   MOVE_SEG_CONSTANT, 0,  0,  0, STEER_MODE_YAW_SPLIT, int(round(shared.deg2count*0.0)),
++    #    60, 60, 4000,   MOVE_SEG_CONSTANT, 0,  0,  0, STEER_MODE_YAW_SPLIT, int(round(shared.deg2count*90.0)),
++    #    60, 60, 2000,   MOVE_SEG_CONSTANT, 0,  0,  0, STEER_MODE_YAW_SPLIT, int(round(shared.deg2count*90.0)),
++    #    60, 60, 500,   MOVE_SEG_RAMP, -30,  -30,  0, STEER_MODE_YAW_SPLIT, int(round(shared.deg2count*90.0))]
+     
+     #numMoves = 4
+     #moveq1 = [numMoves, \
+@@ -110,9 +108,9 @@ def main():
+     #    85, 85, 6500,   MOVE_SEG_CONSTANT, 0, 0,  0, STEER_MODE_YAW_DEC, int(round(shared.deg2count*160.0)),
+     #    85, 85, 6200,   MOVE_SEG_CONSTANT, 0, 0,  0, STEER_MODE_YAW_DEC, int(round(shared.deg2count*240.0))]
+     
+-    #numMoves = 1
+-    #moveq1 = [numMoves, \
+-    #    300, 300, 3000, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_YAW_DEC, 0]
++    numMoves = 1
++    moveq1 = [numMoves, \
++        0, 0, 5000, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0]
+     
+     #No movements, just for static telemetry capture
+     #numMoves = 1
+@@ -173,28 +171,6 @@ def main():
+     xb_safe_exit()
+ 
+ 
+-def trapRun(topspeed = 0, tstime = 0, acceltime = 0, deceltime = 0, steertype = STEER_MODE_YAW_DEC):
+-    moveq = []
+-    numMoves = 0
+-    if acceltime != 0:
+-        ramprate = int(topspeed / ( acceltime/1000.0))
+-        moveq.extend( [ 0, 0, acceltime,   MOVE_SEG_RAMP, ramprate, ramprate,  0, steertype, 0])
+-        numMoves = numMoves + 1
+-        
+-    if tstime != 0:
+-        ramprate = int(topspeed / ( acceltime/1000.0))
+-        moveq.extend( [ topspeed, topspeed, tstime,   MOVE_SEG_CONSTANT, 0, 0,  0, steertype, 0])
+-        numMoves = numMoves + 1
+-        
+-    if deceltime != 0:
+-        ramprate = -int(topspeed / ( deceltime/1000.0))
+-        moveq.extend( [ topspeed, topspeed, deceltime,   MOVE_SEG_RAMP, ramprate, ramprate,  0, steertype, 0])
+-        numMoves = numMoves + 1
+-        
+-    moveq.insert(0,numMoves)
+-    
+-    return [numMoves, moveq]
+-
+ #Provide a try-except over the whole main function
+ # for clean exit. The Xbee module should have better
+ # provisions for handling a clean exit, but it doesn't.
+diff --git a/python/keyboard_control-mix.py b/python/keyboard_control-mix.py
+index 52cc6b1..99e8130 100644
+--- a/python/keyboard_control-mix.py
++++ b/python/keyboard_control-mix.py
+@@ -19,12 +19,9 @@ RESET_ROBOT = True   #Note: This MUST be False if you're using an XBee
+ 
+ def menu():
+     print "-------------------------------------"
+-    print "Keyboard control with Mixing PLUS Aux AMS+Hbridge"
++    print "Keyboard control with Mixing"
+     print " up: increase throt     q:quit   left/right: steering"
+     print " down: decrease throt   s: reset to straight  space: all stop"
+-    print " t: AUX up 10.0 deg   g: AUX down 10.0 deg"
+-    print " z: AUX to 0 deg"
+-    print ""
+ 
+ def main():
+     xb = setupSerial(shared.BS_COMPORT, shared.BS_BAUDRATE)
+@@ -39,24 +36,18 @@ def main():
+         R1.reset()
+         time.sleep(0.5)
+ 
+-    motorgains = [15000,500,0,0,20,    15000,500,0,0,20]
++    motorgains = [15000,50,1000,0,0,    15000,50,1000,0,0]
+     R1.setMotorGains(motorgains, retries = 8)
+     
+     verifyAllMotorGainsSet()  #exits on failure
+     
+-    tailgains = [15000,100,100,0,0]
+-    R1.setTailGains(tailgains, retries = 8)
+-    verifyAllTailGainsSet()
+-    
+-    tinc = 30;
++    tinc = 20;
+ 
+     forward = 0
+     turn = 0
+     
+     left_throt = 0
+     right_throt = 0
+-    
+-    auxangle = 0.0
+ 
+     #blank out any keypresses leading in...
+     while msvcrt.kbhit():
+@@ -72,21 +63,9 @@ def main():
+         elif ord(keypress) == 80: #down
+             forward = forward - tinc
+         elif ord(keypress) == 75: #left
+-            turn = turn - tinc
+-        elif ord(keypress) == 77: #right
+             turn = turn + tinc
+-        elif keypress == 't': #AUX up 15.0
+-            auxangle = auxangle + 10.0
+-            tailq = [1, auxangle, 500, TAIL_SEG_CONSTANT, 0, 0, 0]
+-            R1.sendTailQueue(tailq)
+-        elif keypress == 'g': #AUX down 15.0
+-            auxangle = auxangle - 10.0
+-            tailq = [1, auxangle, 500, TAIL_SEG_CONSTANT, 0, 0, 0]
+-            R1.sendTailQueue(tailq)
+-        elif keypress == 'z': #AUX to 0.0
+-            auxangle = 0.0
+-            tailq = [1, auxangle, 500, TAIL_SEG_CONSTANT, 0, 0, 0]
+-            R1.sendTailQueue(tailq)
++        elif ord(keypress) == 77: #right
++            turn = turn - tinc
+         elif keypress == 's':  #go straight
+                 forward = min(left_throt, right_throt)
+                 turn = 0
+@@ -108,7 +87,7 @@ def main():
+             right_throt = 0
+         
+         #Display output values
+-        outstring = "L: {0:03.1f}  |   R: {1:03.1f}      | AUX : {2:3.1f}      \r".format(left_throt,right_throt,auxangle)
++        outstring = "L: {0:03.1f}  |   R: {1:03.1f}           \r".format(left_throt,right_throt)
+         sys.stdout.write(outstring)
+         sys.stdout.flush()
+         
+diff --git a/python/keyboard_control.py b/python/keyboard_control.py
+index 49071f9..8d34e11 100644
+--- a/python/keyboard_control.py
++++ b/python/keyboard_control.py
+@@ -31,7 +31,7 @@ def main():
+         time.sleep(0.5)  
+     
+ 
+-    motorgains = [32000,000,0,0,0,    32000,0,0,0,0]
++    motorgains = [20000,100,0,0,0,    20000,100,0,0,0]
+     R1.setMotorGains(motorgains, retries = 8)
+     
+     verifyAllMotorGainsSet()  #exits on failure
+diff --git a/python/or_helpers.py b/python/or_helpers.py
+index bece42f..bdded97 100644
+--- a/python/or_helpers.py
++++ b/python/or_helpers.py
+@@ -169,7 +169,7 @@ class Robot:
+         n = moveq[0]
+         if len(moveq[1:]) != n * SEG_LENGTH:
+             print "CRITICAL: Move queue length specification invalid."
+-            print "Wrong number of entries, n = ",n," , len(moveq) = ",len(moveq)
++            print "Wrong number of entries, len(moveq) = ",len(moveque)
+             xb_safe_exit()
+             
+         self.nummoves = n
+@@ -229,7 +229,7 @@ class Robot:
+             packet = [numToSend]
+             packet.extend(toSend)    #Full moveq format to be given to pack()
+             #Actual TX
+-            self.tx( 0, command.SET_TAIL_QUEUE, pack('=h'+numToSend*'fLhhhh', *packet))
++            self.tx( 0, command.SET_TAIL_QUEUE, pack('=h'+numToSend*'hLhhhh', *packet))
+             time.sleep(0.01)                #simple holdoff, probably not neccesary
+             segments = segments[4:]         #remanining unsent ones
+             toSend = segments[0:4]          #Due to python indexing, this could be from 1-4
+@@ -260,7 +260,7 @@ class Robot:
+         shared.last_packet_time = dlStart
+         #bytesIn = 0
+         while self.imudata.count([]) > 0:
+-            time.sleep(0.01)
++            time.sleep(0.02)
+             dlProgress(self.numSamples - self.imudata.count([]) , self.numSamples)
+             if (time.time() - shared.last_packet_time) > timeout:
+                 print ""
+@@ -303,7 +303,7 @@ class Robot:
+         self.findFileName()
+         self.writeFileHeader()
+         fileout = open(self.dataFileName, 'a')
+-        np.savetxt(fileout , np.array(self.imudata), '%d,'*19+'%f,%d,%d,%f,%d', delimiter = ',')
++        np.savetxt(fileout , np.array(self.imudata), '%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%f', delimiter = ',')
+         fileout.close()
+         self.clAnnounce()
+         print "Telemtry data saved to", self.dataFileName
+@@ -323,7 +323,7 @@ class Robot:
+         fileout.write('%  numSamples    = ' + repr(self.numSamples) + '\n')
+         fileout.write('%  moveq         = ' + repr(self.moveq) + '\n')
+         fileout.write('% Columns: \n')
+-        fileout.write('% time | Llegs | Rlegs | DCL | DCR | GyroX | GyroY | GyroZ | GryoZAvg | AccelX | AccelY |AccelZ | LBEMF | RBEMF | SteerIn | SteerOut | Vbatt |  HallL | HallR | YawAngle | DCH1 | DCH2 | SprawlAngle | SprawlIn\n')
++        fileout.write('% time | Llegs | Rlegs | DCL | DCR | GyroX | GyroY | GyroZ | GryoZAvg | AccelX | AccelY |AccelZ | LBEMF | RBEMF | Vbatt | SteerIn | SteerOut | HallL | HallR | YawAngle\n')
+         fileout.close()
+ 
+     def setupImudata(self, moveq):
+@@ -353,7 +353,7 @@ class Robot:
+             filenum.sort()
+             filenum = filenum[-1] + 1
+             self.dataFileName = "imudata" + str(filenum) + ".txt"
+-               
++            
+ 
+ 
+ ########## Helper functions #################
+diff --git a/python/shared.py b/python/shared.py
+index 0b55ad9..28e6757 100644
+--- a/python/shared.py
++++ b/python/shared.py
+@@ -6,7 +6,7 @@ Contents of this file are copyright Andrew Pullin, 2013
+ #BS_COMPORT = 'COM3'
+ #BS_BAUDRATE = 230400
+ #XBee
+-BS_COMPORT = 'COM3'
++BS_COMPORT = 'COM4'
+ BS_BAUDRATE = 57600
+ 
+ deg2count = 14.375
