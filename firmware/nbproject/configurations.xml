@@ -649,6 +649,7 @@
         <property key="preprocessor-macros" value=""/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
+        <property key="use-iar" value="false"/>
       </C30>
       <C30-AS>
         <property key="assembler-symbols" value=""/>
@@ -713,6 +714,7 @@
         <property key="legacy-libc" value="false"/>
         <property key="oXC16glb-macros" value="PID_HARDWARE;__IMAGEPROC2"/>
         <property key="output-file-format" value="elf"/>
+        <property key="save-temps" value="false"/>
       </C30Global>
       <RealICEPlatformTool>
         <property key="ADC 1" value="true"/>
@@ -789,10 +791,12 @@
         <property key="tracecontrol.collectioninterval" value="1"/>
         <property key="tracecontrol.collectionunits" value="1"/>
         <property key="tracecontrol.disablemacros" value="false"/>
+        <property key="tracecontrol.include.timestamp" value="false"/>
         <property key="tracecontrol.medium" value="0"/>
         <property key="tracecontrol.portselect" value="0"/>
         <property key="tracecontrol.select" value="0"/>
         <property key="tracecontrol.spiselect" value="0"/>
+        <property key="tracecontrol.stallontracebufferfull" value="false"/>
         <property key="tracecontrol.timerpriority" value="3"/>
         <property key="tracecontrol.timerselect" value="0"/>
         <property key="tracecontrol.tracebufmax" value="54600"/>

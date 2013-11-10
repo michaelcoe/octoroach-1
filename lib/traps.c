@@ -43,7 +43,8 @@
  *
  **********************************************************************/
 
-#include "p33Fxxxx.h"
+//#include "p33Fxxxx.h"
+#include <xc.h>
 #include "delay.h"
 #include "utils.h"
 #include "estop.h"

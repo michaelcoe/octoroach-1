@@ -27,7 +27,8 @@ pktFormat = { \
     command.SET_MOVE_QUEUE:         '', \
     command.SET_STEERING_GAINS:     '6h', \
     command.SOFTWARE_RESET:         '', \
-    command.SPECIAL_TELEMETRY:      '=LLhhhhhhhhhhhhhhhhLLf', \
+    #command.SPECIAL_TELEMETRY:      '=LLhhhhhhhhhhhhhhhhLLf', \
+    command.SPECIAL_TELEMETRY:      '=LLhhhhhhhhhhhhhhhh', \
     command.ERASE_SECTORS:          'L', \
     command.FLASH_READBACK:         '', \
     command.SLEEP:                  'b', \
@@ -57,7 +58,6 @@ def xbee_received(packet):
     status = ord(rf_data[0])
     type = ord(rf_data[1])
     data = rf_data[2:]
-    
     
     #Record the time the packet is received, so command timeouts
     # can be done

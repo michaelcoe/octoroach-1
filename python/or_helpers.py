@@ -69,6 +69,10 @@ class Robot:
     numSamples = 0
     VERBOSE = True
     
+    #Telemetry Format - automatic generation from or_telem.h would be great
+    telemFormat = '%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d'
+    telemSaveRate = 1000
+    
     def __init__(self, address, xb):
         self.DEST_ADDR = address
         self.DEST_ADDR_int = unpack('>h',self.DEST_ADDR)[0] #address as integer
@@ -303,7 +307,7 @@ class Robot:
         self.findFileName()
         self.writeFileHeader()
         fileout = open(self.dataFileName, 'a')
-        np.savetxt(fileout , np.array(self.imudata), '%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%f', delimiter = ',')
+        np.savetxt(fileout , np.array(self.imudata), self.telemFormat, delimiter = ',')
         fileout.close()
         self.clAnnounce()
         print "Telemtry data saved to", self.dataFileName
@@ -333,7 +337,7 @@ class Robot:
         self.runtime = sum([moveq[i] for i in [(ind*MOVE_QUEUE_ENTRY_LEN)+3 for ind in range(0,moveq[0])]])
        
         #calculate the number of telemetry packets we expect
-        self.numSamples = int(ceil(300 * (self.runtime + self.leadinTime + self.leadoutTime) / 1000.0))
+        self.numSamples = int(ceil(self.telemSaveRate * (self.runtime + self.leadinTime + self.leadoutTime) / 1000.0))
         #allocate an array to write the downloaded telemetry data into
         self.imudata = [ [] ] * self.numSamples
         self.clAnnounce()

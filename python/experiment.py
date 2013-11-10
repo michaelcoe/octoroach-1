@@ -14,7 +14,7 @@ from or_helpers import *
 
 
 ###### Operation Flags ####
-SAVE_DATA1 = False 
+SAVE_DATA1 = True 
 RESET_R1 = True  
 
 EXIT_WAIT   = False
@@ -108,9 +108,10 @@ def main():
     #    85, 85, 6500,   MOVE_SEG_CONSTANT, 0, 0,  0, STEER_MODE_YAW_DEC, int(round(shared.deg2count*160.0)),
     #    85, 85, 6200,   MOVE_SEG_CONSTANT, 0, 0,  0, STEER_MODE_YAW_DEC, int(round(shared.deg2count*240.0))]
     
-    #numMoves = 1
-    #moveq1 = [numMoves, \
-    #    0, 0, 5000, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0]
+    #Stationary, just collect data
+    numMoves = 1
+    moveq1 = [numMoves, \
+        0, 0, 1000, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0]
     
     #No movements, just for static telemetry capture
     #numMoves = 1
@@ -118,7 +119,7 @@ def main():
     #    0, 0, 2000,   MOVE_SEG_CONSTANT, 0,  0,  0, STEER_MODE_OFF, 0]    
      
     #trapezoidal velocity profile
-    [numMoves, moveq1] = trapRun(topspeed = 500, tstime = 3000, acceltime=500, deceltime=500,steertype = STEER_MODE_YAW_SPLIT)
+    #[numMoves, moveq1] = trapRun(topspeed = 500, tstime = 3000, acceltime=500, deceltime=500,steertype = STEER_MODE_YAW_SPLIT)
     
 
     #Timing settings
@@ -138,7 +139,6 @@ def main():
     print "  ***************************"
     raw_input("  Press ENTER to start run ...")
     print ""
-    time.sleep(1)
     
     # Trigger telemetry save, which starts as soon as it is received
     

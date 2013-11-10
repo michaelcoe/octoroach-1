@@ -11,7 +11,8 @@
 
 #include "settings.h"
 #include "Generic.h"
-#include "p33Fxxxx.h"
+//#include "p33Fxxxx.h"
+#include <xc.h>
 #include "init_default.h"
 #include "ports.h"
 #include "battery.h"
@@ -71,7 +72,7 @@ int main(void) {
     radioSetSrcAddr(RADIO_SRC_ADDR);
     
     dfmemSetup();
-    //xlSetup();
+    xlSetup();
     gyroSetup();
     
 

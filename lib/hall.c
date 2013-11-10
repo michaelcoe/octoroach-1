@@ -7,7 +7,7 @@
 // authors: rfearing, apullin
 // code for position feedback using hall sensors on left and right motor
 
-#include "p33Fxxxx.h"
+#include <xc.h>
 #include "led.h"
 #include "pid.h"
 #include "hall.h"
@@ -20,7 +20,6 @@
 #include "pwm.h"
 #include "move_queue.h"
 #include "hall.h"
-#include "p33Fxxxx.h"
 #include "incap.h" // input capture
 #include "sys_service.h"
 #include <stdlib.h> // for malloc

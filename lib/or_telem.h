@@ -3,7 +3,9 @@
 //or_telem.h , OctoRoACH specific telemetry packet format header
 
 // Data structure type
+// Leave the START_PARSE and END_PARSE comments in place!
 typedef struct {
+//START_PARSE
     int inputL;
     int inputR;
     int dcL;
@@ -20,6 +22,7 @@ typedef struct {
     int steerIn;
     int steerOut;
     int Vbatt;
+//END_PARSE
 } orTelemStruct_t;
 
 void orTelemGetData(unsigned char* ptr);
