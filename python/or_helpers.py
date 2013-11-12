@@ -71,7 +71,7 @@ class Robot:
     
     #Telemetry Format - automatic generation from or_telem.h would be great
     telemFormat = '%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d'
-    telemSaveRate = 1000
+    telemSaveRate = 300
     
     def __init__(self, address, xb):
         self.DEST_ADDR = address

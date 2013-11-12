@@ -16,13 +16,13 @@
 //Timer parameters
 #define TIMER_FREQUENCY     300                 // 400 Hz
 #define TIMER_PERIOD        1/TIMER_FREQUENCY
-#define DEFAULT_SKIP_NUM    1 //Default to 150 Hz save rate
+#define DEFAULT_SKIP_NUM    1
 
 
 #if defined(__RADIO_HIGH_DATA_RATE)
 #define READBACK_DELAY_TIME_MS 3
 #else
-#define READBACK_DELAY_TIME_MS 9
+#define READBACK_DELAY_TIME_MS 12
 #endif
 
 telemStruct_t telemBuffer;
@@ -77,9 +77,9 @@ static void SetupTimer5() {
     T5CON1value = T5_ON & T5_IDLE_CON & T5_GATE_OFF & T5_PS_1_64 & T5_SOURCE_INT;
     // Period is set so that period = 5ms (200Hz), MIPS = 40
     //period = 3125; // 200Hz
-    //T5PERvalue = 2083; // ~300Hz
+    T5PERvalue = 2083; // ~300Hz
     //T5PERvalue = 1250;   // 500Hz
-    T5PERvalue = 625;   // 1000Hz
+    //T5PERvalue = 625;   // 1000Hz
     int retval;
     retval = sysServiceConfigT5(T5CON1value, T5PERvalue, T5_INT_PRIOR_4 & T5_INT_ON);
     //OpenTimer5(con_reg, period);
@@ -121,10 +121,11 @@ void telemReadbackSamples(unsigned long numSamples) {
         //Reliable send, with linear backoff
         do {
             //debugpins1_set();
-            telemSendDataDelay(&sampleData, delaytime_ms);
+            telemEnqueueDataDelay(&sampleData, delaytime_ms);
             //Linear backoff
             delaytime_ms += 0;
             //debugpins1_clr();
+            radioProcess(); //Consume radio queue
         } while (trxGetLastACKd() == 0);
         delaytime_ms = READBACK_DELAY_TIME_MS;
     }
@@ -133,7 +134,8 @@ void telemReadbackSamples(unsigned long numSamples) {
 
 }
 
-void telemSendDataDelay(telemStruct_t* sample, int delaytime_ms) {
+void telemEnqueueDataDelay(telemStruct_t* sample, int delaytime_ms) {
+    
     // Create Payload, set status and type (don't cares)
     MacPacket pkt = radioRequestPacket(telemPacketSize);
     if(pkt == NULL) { return; }
@@ -145,13 +147,10 @@ void telemSendDataDelay(telemStruct_t* sample, int delaytime_ms) {
     paySetType(pld, CMD_SPECIAL_TELEMETRY); 
     paySetStatus(pld, 0);
 
-    //Force immediate send
-    while(!radioEnqueueTxPacket(pkt)) { 
+    while(!radioEnqueueTxPacket(pkt)) {
         radioReturnPacket(pkt);	// Delete packet if append fails
     }
-
-    radioProcess();
-
+    
     delay_ms(delaytime_ms); // allow radio transmission time
 
 }

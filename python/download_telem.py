@@ -30,10 +30,10 @@ def main():
         time.sleep(0.35)
     
     # Query
-    R1.query( retries = 8 )
+    #R1.query( retries = 8 )
     
     #Verify all robots can be queried
-    verifyAllQueried()  #exits on failure
+    #verifyAllQueried()  #exits on failure
 
     numToDL = raw_input("How many samples to download? ")
     
@@ -51,7 +51,7 @@ def main():
         raw_input("  Press ENTER to start download ...")
         print ""
 
-        R1.downloadTelemetry()
+        R1.downloadTelemetry(timeout=5000)
 
     if EXIT_WAIT:  #Pause for a Ctrl + Cif specified
         while True:

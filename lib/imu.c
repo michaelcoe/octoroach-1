@@ -68,13 +68,14 @@ static void imuISRHandler(){
         int xlData[3];
 
 	/////// Get Gyro data and calc average via filter
-        CRITICAL_SECTION_START;
+        //CRITICAL_SECTION_START;
         gyroReadXYZ(); //bad design of gyro module; todo: humhu
 	gyroGetIntXYZ(gyroData);
-	
+	//CRITICAL_SECTION_END;
+
         //XL
         xlGetXYZ((unsigned char*)xlData); //bad design of gyro module; todo: humhu
-        CRITICAL_SECTION_END;
+        
 
         lastGyroXValue = gyroData[0];
         lastGyroYValue = gyroData[1];
@@ -118,11 +119,11 @@ static void SetupTimer4(){
     // prescale 1:64
     T4CON1value = T4_ON & T4_IDLE_CON & T4_GATE_OFF & T4_PS_1_64 & T4_SOURCE_INT;
     // Period is set so that period = 3.3ms (300Hz), MIPS = 40
-    //T4PERvalue = 2083; // ~300Hz (40e6/(64*2083) where 64 is the prescaler
+    T4PERvalue = 2083; // ~300Hz (40e6/(64*2083) where 64 is the prescaler
     /////////////////////
     //// For high speed imu data
-    T4PERvalue = 625;   //1000 hz
-    T4PERvalue = 1250;  //500 hz
+    //T4PERvalue = 625;   //1000 hz
+    //T4PERvalue = 1250;  //500 hz
     int retval;
     retval = sysServiceConfigT4(T4CON1value, T4PERvalue, T4_INT_PRIOR_6 & T4_INT_ON);
 }
