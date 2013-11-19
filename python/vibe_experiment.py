@@ -110,23 +110,13 @@ def main():
     #    85, 85, 6200,   MOVE_SEG_CONSTANT, 0, 0,  0, STEER_MODE_YAW_DEC, int(round(shared.deg2count*240.0))]
     
     #Stationary, just collect data
-    numMoves = 15
+    numMoves = 5
     moveq1 = [numMoves, \
         0, 0,   500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
         0, 25,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
         0, 50,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
         0, 75,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 100,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 125,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 150,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 175,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 200,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 225,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 250,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 275,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 300,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 325,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 350,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0]
+        0, 100,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0]
 
     
     #No movements, just for static telemetry capture

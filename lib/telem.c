@@ -106,35 +106,61 @@ void telemSetSamplesToSave(unsigned long n) {
 }
 
 void telemReadbackSamples(unsigned long numSamples) {
-    int delaytime_ms = READBACK_DELAY_TIME_MS;
     unsigned long i = 0; //will actually be the same as the sampleIndex
-
+    
     LED_GREEN = 1;
-    //Disable motion interrupts for readback
-    //_T1IE = 0; _T5IE=0; //TODO: what is a cleaner way to do this?
 
+    MacPacket packet;
+    Payload pld;
     telemStruct_t sampleData;
 
+    do{
+        telemGetSample(i, sizeof (sampleData), (unsigned char*) (&sampleData));
+
+        // Create a radio packet
+        packet = radioRequestPacket(telemPacketSize);
+        if(packet == NULL) { radioProcess(); delay_ms(5); return; }
+        macSetDestAddr(packet, RADIO_DST_ADDR);
+        macSetDestPan(packet, RADIO_PAN_ID);
+
+        // Write the telemetry struct into the packet payload
+        pld = macGetPayload(packet);
+        paySetType(pld, CMD_SPECIAL_TELEMETRY);
+        paySetData(pld, telemPacketSize, (unsigned char *) &sampleData);
+        if(!radioEnqueueTxPacket(packet)) {
+                radioReturnPacket(packet);	// Delete packet if append fails
+        }
+        else{
+            i++;
+        }
+        radioProcess();
+        //Blocking send
+        //while ( !radioEnqueueTxPacket(packet) )
+        //radioReturnPacket(packet);
+        delay_ms(10);
+        //if(trxGetLastACKd()){ i++; }
+
+    } while( i < numSamples );
+
+    /*
     for (i = 0; i < numSamples; i++) {
         //Retireve data from flash
         telemGetSample(i, sizeof (sampleData), (unsigned char*) (&sampleData));
         //Reliable send, with linear backoff
         do {
             //debugpins1_set();
-            telemEnqueueDataDelay(&sampleData, delaytime_ms);
-            //Linear backoff
-            delaytime_ms += 0;
-            //debugpins1_clr();
+            telemEnqueueData(&sampleData);
             radioProcess(); //Consume radio queue
-        } while (trxGetLastACKd() == 0);
-        delaytime_ms = READBACK_DELAY_TIME_MS;
+            delay_ms(delaytime_ms);
+        //} while (trxGetLastACKd() == 0);
+        //delaytime_ms = READBACK_DELAY_TIME_MS;
     }
-
+*/
     LED_GREEN = 0;
 
 }
 
-void telemEnqueueDataDelay(telemStruct_t* sample, int delaytime_ms) {
+void telemEnqueueData(telemStruct_t* sample) {
     
     // Create Payload, set status and type (don't cares)
     MacPacket pkt = radioRequestPacket(telemPacketSize);
@@ -150,8 +176,6 @@ void telemEnqueueDataDelay(telemStruct_t* sample, int delaytime_ms) {
     while(!radioEnqueueTxPacket(pkt)) {
         radioReturnPacket(pkt);	// Delete packet if append fails
     }
-    
-    delay_ms(delaytime_ms); // allow radio transmission time
 
 }
 

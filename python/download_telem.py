@@ -30,10 +30,10 @@ def main():
         time.sleep(0.35)
     
     # Query
-    #R1.query( retries = 8 )
+    R1.query( retries = 8 )
     
     #Verify all robots can be queried
-    #verifyAllQueried()  #exits on failure
+    verifyAllQueried()  #exits on failure
 
     numToDL = raw_input("How many samples to download? ")
     

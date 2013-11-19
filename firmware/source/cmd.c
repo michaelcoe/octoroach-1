@@ -332,7 +332,7 @@ static void cmdSoftwareReset(unsigned char status, unsigned char length, unsigne
     paySetType(pld, CMD_SOFTWARE_RESET);
     paySetStatus(pld, 0);
     
-    while(!radioEnqueueTxPacket(response)) { radioProcess(); }
+    while(!radioEnqueueTxPacket(response)) { radioProcess(); delay_ms(5);}
 
 #ifndef __DEBUG
     __asm__ volatile ("reset");
