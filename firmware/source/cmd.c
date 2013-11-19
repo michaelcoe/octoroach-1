@@ -319,20 +319,12 @@ static void cmdSetSteeringGains(unsigned char status, unsigned char length, unsi
 
 static void cmdSoftwareReset(unsigned char status, unsigned char length, unsigned char *frame) {
     char resetmsg[] = "RESET";
-    int len = strlen(resetmsg);
-
-    MacPacket response;
-    response = radioRequestPacket(len);
-
-    macSetDestPan(response, RADIO_PAN_ID);
-    macSetDestAddr(response, RADIO_DST_ADDR);
-    Payload pld = macGetPayload(response);
-
-    paySetData(pld, len, (unsigned char*)resetmsg);
-    paySetType(pld, CMD_SOFTWARE_RESET);
-    paySetStatus(pld, 0);
+    int len = 6; //length of reset string above, avoid calling strlen()
     
-    while(!radioEnqueueTxPacket(response)) { radioProcess(); delay_ms(5);}
+    radioSendData(RADIO_DST_ADDR, 0, CMD_SOFTWARE_RESET, len,
+           (unsigned char*) &resetmsg, 0 );
+    
+    delay_ms(20); //Leave time for radio to TX reset message
 
 #ifndef __DEBUG
     __asm__ volatile ("reset");

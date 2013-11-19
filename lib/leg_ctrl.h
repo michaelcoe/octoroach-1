@@ -38,5 +38,7 @@ void legCtrlSetup();
 void legCtrlSetInput(unsigned int num, int val);
 void legCtrlOnOff(unsigned int num, unsigned char state);
 void legCtrlSetGains(unsigned int num, int Kp, int Ki, int Kd, int Kaw, int ff);
+void legCtrlSuspend(void);
+void legCtrlResume(void);
 
 #endif

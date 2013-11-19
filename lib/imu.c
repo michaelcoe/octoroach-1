@@ -13,7 +13,7 @@
 #include "imu.h"
 #include <stdlib.h>
 
-#define TIMER_FREQUENCY     300.0                 // 300 Hz
+#define TIMER_FREQUENCY     1000.0                 // 300 Hz
 #define TIMER_PERIOD        1/TIMER_FREQUENCY   //This is used for numerical integration
 
 //Setup for Gyro Z averaging filter
@@ -50,6 +50,8 @@ static void imuServiceRoutine(void);  //To be installed with sysService
 //The following local functions are called by the service routine:
 static void imuISRHandler(void);
 
+static char imuServiceHandle;
+
 ////   Private functions
 ////////////////////////
 /////////        IMU ISR          ////////
@@ -68,15 +70,16 @@ static void imuISRHandler(){
         int xlData[3];
 
 	/////// Get Gyro data and calc average via filter
-        //CRITICAL_SECTION_START;
+        CRITICAL_SECTION_START;
         gyroReadXYZ(); //bad design of gyro module; todo: humhu
 	gyroGetIntXYZ(gyroData);
-	//CRITICAL_SECTION_END;
+	
 
         //XL
         xlGetXYZ((unsigned char*)xlData); //bad design of gyro module; todo: humhu
-        
+        CRITICAL_SECTION_END;
 
+        
         lastGyroXValue = gyroData[0];
         lastGyroYValue = gyroData[1];
         lastGyroZValue = gyroData[2];
@@ -97,18 +100,18 @@ static void imuISRHandler(){
         }
         
         // Conversion to float
-        lastGyroXValueDeg = (float) (lastGyroXValue*LSB2DEG);
-        lastGyroYValueDeg = (float) (lastGyroYValue*LSB2DEG);
-        lastGyroZValueDeg = (float) (lastGyroZValue*LSB2DEG); 
+        //lastGyroXValueDeg = (float) (lastGyroXValue*LSB2DEG);
+        //lastGyroYValueDeg = (float) (lastGyroYValue*LSB2DEG);
+        //lastGyroZValueDeg = (float) (lastGyroZValue*LSB2DEG);
 
         //Update the filter with a new value
         dfilterAvgUpdate(&gyroZavg, gyroData[2]);
         //Calcualte new average from filter
         lastGyroZValueAvg = dfilterAvgCalc(&gyroZavg);
 
-        lastGyroZValueAvgDeg = (float)lastGyroZValueAvg*LSB2DEG;
+        //lastGyroZValueAvgDeg = (float)lastGyroZValueAvg*LSB2DEG;
 
-        lastBodyZPositionDeg = lastBodyZPositionDeg + lastGyroZValueDeg*TIMER_PERIOD;
+        //lastBodyZPositionDeg = lastBodyZPositionDeg + lastGyroZValueDeg*TIMER_PERIOD;
         
 }
 
@@ -131,8 +134,7 @@ static void SetupTimer4(){
 ////   Public functions
 ////////////////////////
 void imuSetup(){
-    int retval;
-    retval = sysServiceInstallT4(imuServiceRoutine);
+    imuServiceHandle = sysServiceInstallT4(imuServiceRoutine);
     SetupTimer4();
     dfilterAvgCreate(&gyroZavg, GYRO_AVG_SAMPLES);
 }
@@ -190,4 +192,16 @@ int imuGetXLYValue(){
 
 int imuGetXLZValue(){
     return lastXLZValue;
+}
+
+void imuSuspend(void) {
+    if (imuServiceHandle != -1) {
+        sysServiceDisableSvcT4(imuServiceHandle);
+    }
+}
+
+void imuResume(void) {
+    if (imuServiceHandle != -1) {
+        sysServiceEnableSvcT4(imuServiceHandle);
+    }
 }

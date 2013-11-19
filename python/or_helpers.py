@@ -72,6 +72,7 @@ class Robot:
     #Telemetry Format - automatic generation from or_telem.h would be great
     telemFormat = '%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d'
     telemSaveRate = 300
+    telemHeaderString = '% time | Llegs | Rlegs | DCL | DCR | GyroX | GyroY | GyroZ | GryoZAvg | AccelX | AccelY |AccelZ | LBEMF | RBEMF | SteerIn | SteerOut | Vbatt |\n'
     
     def __init__(self, address, xb):
         self.DEST_ADDR = address
@@ -327,7 +328,7 @@ class Robot:
         fileout.write('%  numSamples    = ' + repr(self.numSamples) + '\n')
         fileout.write('%  moveq         = ' + repr(self.moveq) + '\n')
         fileout.write('% Columns: \n')
-        fileout.write('% time | Llegs | Rlegs | DCL | DCR | GyroX | GyroY | GyroZ | GryoZAvg | AccelX | AccelY |AccelZ | LBEMF | RBEMF | Vbatt | SteerIn | SteerOut | HallL | HallR | YawAngle\n')
+        fileout.write(self.telemHeaderString)
         fileout.close()
 
     def setupImudata(self, moveq):

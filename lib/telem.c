@@ -14,7 +14,7 @@
 #include "debugpins.h"
 
 //Timer parameters
-#define TIMER_FREQUENCY     300                 // 400 Hz
+#define TIMER_FREQUENCY     300.0
 #define TIMER_PERIOD        1/TIMER_FREQUENCY
 #define DEFAULT_SKIP_NUM    1
 
@@ -110,37 +110,33 @@ void telemReadbackSamples(unsigned long numSamples) {
     
     LED_GREEN = 1;
 
-    MacPacket packet;
-    Payload pld;
+
+    //MacPacket packet;
+    //Payload pld;
     telemStruct_t sampleData;
+    int delaytime_ms = 0;
+
+    legCtrlSuspend();
+    imuSuspend();
 
     do{
         telemGetSample(i, sizeof (sampleData), (unsigned char*) (&sampleData));
 
-        // Create a radio packet
-        packet = radioRequestPacket(telemPacketSize);
-        if(packet == NULL) { radioProcess(); delay_ms(5); return; }
-        macSetDestAddr(packet, RADIO_DST_ADDR);
-        macSetDestPan(packet, RADIO_PAN_ID);
+        radioSendData(RADIO_DST_ADDR, 0, CMD_SPECIAL_TELEMETRY, telemPacketSize,
+           (unsigned char*) &sampleData, 0 );
 
-        // Write the telemetry struct into the packet payload
-        pld = macGetPayload(packet);
-        paySetType(pld, CMD_SPECIAL_TELEMETRY);
-        paySetData(pld, telemPacketSize, (unsigned char *) &sampleData);
-        if(!radioEnqueueTxPacket(packet)) {
-                radioReturnPacket(packet);	// Delete packet if append fails
-        }
-        else{
-            i++;
-        }
-        radioProcess();
+        i++;
         //Blocking send
         //while ( !radioEnqueueTxPacket(packet) )
         //radioReturnPacket(packet);
-        delay_ms(10);
-        //if(trxGetLastACKd()){ i++; }
+        
+        //if(trxGetLastACKd()){ i++;}
+
 
     } while( i < numSamples );
+
+    imuResume();
+    legCtrlResume();
 
     /*
     for (i = 0; i < numSamples; i++) {

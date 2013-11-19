@@ -61,6 +61,8 @@ int legCtrlOutputChannels[NUM_MOTOR_PIDS];
 //Global flag for wether or not the robot is in motion
 volatile char inMotion;
 
+static char legCtrlServiceHandle;
+
 //Function to be installed into T1, and setup function
 static void SetupTimer1(void);
 static void legCtrlServiceRoutine(void);  //To be installed with sysService
@@ -123,8 +125,7 @@ void legCtrlSetup() {
     legCtrlOutputChannels[1] = MC_CHANNEL_PWM2;
 
     SetupTimer1(); // Timer 1 @ 1 Khz
-    int retval;
-    retval = sysServiceInstallT1(legCtrlServiceRoutine);
+    legCtrlServiceHandle = sysServiceInstallT1(legCtrlServiceRoutine);
     //ADC_OffsetL = 1; //prevent divide by zero errors
     //ADC_OffsetR = 1;
 
@@ -430,4 +431,16 @@ void legCtrlOnOff(unsigned int num, unsigned char state) {
 
 void legCtrlSetGains(unsigned int num, int Kp, int Ki, int Kd, int Kaw, int ff) {
     pidSetGains(&(motor_pidObjs[num]), Kp, Ki, Kd, Kaw, ff);
+}
+
+void legCtrlSuspend(void){
+    if(legCtrlServiceHandle != -1){
+        sysServiceDisableSvcT1(legCtrlServiceHandle);
+    }
+}
+
+void legCtrlResume(void){
+    if(legCtrlServiceHandle != -1){
+        sysServiceEnableSvcT1(legCtrlServiceHandle);
+    }
 }

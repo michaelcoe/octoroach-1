@@ -111,7 +111,7 @@ def main():
     #Stationary, just collect data
     numMoves = 1
     moveq1 = [numMoves, \
-        0, 0, 250, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0]
+        0, 0, 1000, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0]
     
     #No movements, just for static telemetry capture
     #numMoves = 1
@@ -163,7 +163,7 @@ def main():
         #Wait for robots to do runs
         time.sleep(maxtime / 1000.0)
         raw_input("Press Enter to start telemtry readback ...")
-        R1.downloadTelemetry(timeout=1000)
+        R1.downloadTelemetry()
 
     if EXIT_WAIT:  #Pause for a Ctrl + Cif specified
         while True:

@@ -84,6 +84,7 @@ int sysServiceEnableSvcT1(unsigned int svcNum){
     }
     else{ return svcNum; }
 }
+
 //Service disabler
 int sysServiceDisableSvcT1(unsigned int svcNum){
     if(svcNum < SERVICE_VECT_LEN){
