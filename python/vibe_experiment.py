@@ -110,19 +110,22 @@ def main():
     #    85, 85, 6200,   MOVE_SEG_CONSTANT, 0, 0,  0, STEER_MODE_YAW_DEC, int(round(shared.deg2count*240.0))]
     
     #Stationary, just collect data
-    numMoves = 5
-    moveq1 = [numMoves, \
-        0, 0,   500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 25,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 50,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 75,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
-        0, 100,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0]
+    #numMoves = 5
+    #moveq1 = [numMoves, \
+    #    0, 0,   500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
+    #    0, 25,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
+    #    0, 50,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
+    #    0, 75,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0,
+    #    0, 100,  500, MOVE_SEG_CONSTANT, 0, 0, 0, STEER_MODE_OFF, 0]
 
     
     #No movements, just for static telemetry capture
     #numMoves = 1
     #moveq1 = [numMoves, \
-    #    0, 0, 2000,   MOVE_SEG_CONSTANT, 0,  0,  0, STEER_MODE_OFF, 0]    
+    #    0, 0, 2000,   MOVE_SEG_CONSTANT, 0,  0,  0, STEER_MODE_OFF, 0]   
+    numMoves = 1
+    moveq1 = [numMoves, \
+        0, 0, 10000,   MOVE_SEG_RAMP, 40,  40,  0, STEER_MODE_OFF, 0]      
      
     #trapezoidal velocity profile
     #[numMoves, moveq1] = trapRun(topspeed = 500, tstime = 3000, acceltime=500, deceltime=500,steertype = STEER_MODE_YAW_SPLIT)

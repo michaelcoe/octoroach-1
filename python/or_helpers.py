@@ -71,7 +71,7 @@ class Robot:
     
     #Telemetry Format - automatic generation from or_telem.h would be great
     telemFormat = '%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d'
-    telemSaveRate = 300
+    telemSaveRate = 1000
     telemHeaderString = '% time | Llegs | Rlegs | DCL | DCR | GyroX | GyroY | GyroZ | GryoZAvg | AccelX | AccelY |AccelZ | LBEMF | RBEMF | SteerIn | SteerOut | Vbatt |\n'
     
     def __init__(self, address, xb):

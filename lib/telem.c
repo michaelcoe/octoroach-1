@@ -77,9 +77,9 @@ static void SetupTimer5() {
     T5CON1value = T5_ON & T5_IDLE_CON & T5_GATE_OFF & T5_PS_1_64 & T5_SOURCE_INT;
     // Period is set so that period = 5ms (200Hz), MIPS = 40
     //period = 3125; // 200Hz
-    T5PERvalue = 2083; // ~300Hz
+    //T5PERvalue = 2083; // ~300Hz
     //T5PERvalue = 1250;   // 500Hz
-    //T5PERvalue = 625;   // 1000Hz
+    T5PERvalue = 625;   // 1000Hz
     int retval;
     retval = sysServiceConfigT5(T5CON1value, T5PERvalue, T5_INT_PRIOR_4 & T5_INT_ON);
     //OpenTimer5(con_reg, period);
